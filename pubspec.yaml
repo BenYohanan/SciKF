@@ -1,0 +1,61 @@
+name: news_feeds
+description: "Display science news (discoveries, findings) specific to Nigeria, allow users to ask questions via prompts, and view responses and details"
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  http: ^1.4.0
+  provider: ^6.1.5
+  url_launcher: ^6.3.1
+  flutter_svg: ^2.0.7
+
+  dropdown_search: ^5.0.6
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  intl: ^0.20.2
+  another_flushbar: ^1.12.30
+  crypto: ^3.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
+
+# The following section is specific to Flutter packages.
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/img/
+    - assets/icons/
+    - assets/fonts/
+  fonts:
+    - family: OpenSans-Bold
+      fonts:
+        - asset: assets/fonts/OpenSans-Bold.ttf
+        - asset: assets/fonts/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-Bold.ttf
+          style: italic
+        - asset: assets/fonts/Roboto-Bold.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-Bold.ttf
+          style: italic
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/img/icon.jpg"
