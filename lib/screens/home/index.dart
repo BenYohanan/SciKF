@@ -1,34 +1,32 @@
+// screens/home/index.dart
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import '../../model/news_item.dart';
+import '../../services/DatabaseHelper.dart';
 import '../../services/api_service.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
+import '../../widgets/dialogs.dart';
 import 'Components/news_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final DatabaseHelper dbHelper;
+  const HomeScreen({super.key, required this.dbHelper});
 
   @override
   HomeScreenState createState() => HomeScreenState();
 }
+
 class HomeScreenState extends State<HomeScreen> {
-  List<NewsItem> newsItems = [];
+  late Future<List<NewsItem>> _newsFuture;
+
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _newsFuture = ApiService(widget.dbHelper).fetchScienceNews();
   }
 
-  Future<void> _fetchData() async {
-    final fetchedNews = await ApiService().fetchScienceNews();
-    if (mounted) {
-      setState(() {
-        newsItems = fetchedNews;
-      });
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,90 +35,119 @@ class HomeScreenState extends State<HomeScreen> {
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
         child: CustomAppBar(fullName: "User", isOnline: true),
       ),
-      body: newsItems.isEmpty
-          ? Center(
-        child: Text(
-          'No news available. Please try again later.',
-          style: TextStyle(fontSize: getProportionateScreenWidth(16)),
-        ),
-      )
-          : ListView.builder(
-        padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-        itemCount: newsItems.length,
-        itemBuilder: (context, index) {
-          final newsItem = newsItems[index];
-          return GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NewsDetailScreen(newsItem: newsItem),
+      body: FutureBuilder<List<NewsItem>>(
+        future: _newsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.connectionState == ConnectionState.active) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Dialogs.loader(context);
+            });
+            return const SizedBox.shrink();
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context, rootNavigator: true).pop();
+          });
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Failed to load news: ${snapshot.error}',
+                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
               ),
-            ),
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              margin: EdgeInsets.only(bottom: getProportionateScreenHeight(12)),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
+            );
+          }
+
+          final newsItems = snapshot.data ?? [];
+          if (newsItems.isEmpty) {
+            return Center(
+              child: Text(
+                'No news available. Please try again later.',
+                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: EdgeInsets.all(getProportionateScreenHeight(16)),
+            itemCount: newsItems.length,
+            itemBuilder: (context, index) {
+              final newsItem = newsItems[index];
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewsDetailScreen(newsItem: newsItem),
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      newsItem.title,
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(15),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                ),
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  margin: EdgeInsets.only(bottom: getProportionateScreenHeight(12)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: getProportionateScreenHeight(8)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(getProportionateScreenHeight(16)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          newsItem.date ?? 'N/A',
+                          newsItem.title,
+                          style: TextStyle(
+                            fontSize: getProportionateScreenWidth(15),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: getProportionateScreenHeight(8)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              newsItem.date,
+                              style: TextStyle(
+                                fontSize: getProportionateScreenWidth(14),
+                                fontWeight: FontWeight.bold,
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                            Text(
+                              newsItem.source,
+                              style: TextStyle(
+                                fontSize: getProportionateScreenWidth(12),
+                                fontWeight: FontWeight.bold,
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: getProportionateScreenHeight(8)),
+                        Text(
+                          newsItem.summary,
                           style: TextStyle(
                             fontSize: getProportionateScreenWidth(14),
-                            fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
+                            color: Colors.grey[600],
                           ),
-                        ),
-                        Text(
-                          newsItem.source ?? 'AI Generated',
-                          style: TextStyle(
-                            fontSize: getProportionateScreenWidth(12),
-                            fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
-                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    SizedBox(height: getProportionateScreenHeight(8)),
-                    Text(
-                      newsItem.summary,
-                      style: TextStyle(
-                        fontSize: getProportionateScreenWidth(14),
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),

@@ -1,24 +1,25 @@
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:http/http.dart' as http;
-import 'package:hive/hive.dart';
 import '../model/news_item.dart';
+import 'DatabaseHelper.dart';
 
 class ApiService {
   static const String apiKey = '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';
   static const String endpoint = 'https://api.openai.com/v1/chat/completions';
+  final DatabaseHelper dbHelper;
+
+  ApiService(this.dbHelper);
 
   Future<List<NewsItem>> fetchScienceNews() async {
-    final box = Hive.box('newsCache');
-    final cachedData = box.get('scienceNews');
-    final cachedTimestamp = box.get('scienceNewsTimestamp');
-    if (cachedData != null && cachedTimestamp != null) {
+    final cachedTimestamp = await dbHelper.getTimestamp('scienceNewsTimestamp');
+    if (cachedTimestamp != null) {
       final lastCached = DateTime.parse(cachedTimestamp);
       final now = DateTime.now();
       if (lastCached.day == now.day &&
           lastCached.month == now.month &&
           lastCached.year == now.year) {
-        return List<NewsItem>.from(cachedData);
+        return await dbHelper.getNewsItems();
       }
     }
 
@@ -49,13 +50,12 @@ class ApiService {
         details: item['details']?.toString() ?? '',
         sourceUrl: item['sourceUrl']?.toString() ?? '',
         source: item['source']?.toString() ?? '',
-        date: item['date'],
+        date: item['date']?.toString() ?? '',
         responseType: 'news',
       )).toList();
 
-      // Cache the results with timestamp
-      await box.put('scienceNews', newsItems);
-      await box.put('scienceNewsTimestamp', DateTime.now().toIso8601String());
+      await dbHelper.insertNewsItems(newsItems);
+      await dbHelper.saveTimestamp('scienceNewsTimestamp', DateTime.now().toIso8601String());
       return newsItems;
     } else {
       throw Exception('Failed to fetch news');
@@ -63,14 +63,7 @@ class ApiService {
   }
 
   Future<NewsItem> answerPrompt(String prompt) async {
-    final box = Hive.box('promptResponses');
     final responseKey = 'prompt_${md5.convert(utf8.encode(prompt)).toString()}';
-
-    final cachedResponse = box.get(responseKey);
-    if (cachedResponse != null) {
-      return cachedResponse as NewsItem;
-    }
-
     final response = await http.post(
       Uri.parse(endpoint),
       headers: {
@@ -102,12 +95,7 @@ class ApiService {
         responseType: 'method',
       );
 
-      await box.put(responseKey, newsItem);
-
-      final allResponses = box.get('allPromptResponses', defaultValue: <NewsItem>[]);
-      allResponses.add(newsItem);
-      await box.put('allPromptResponses', allResponses);
-
+      await dbHelper.insertPromptResponse(responseKey, newsItem);
       return newsItem;
     } else {
       throw Exception('Failed to get response');
@@ -115,7 +103,6 @@ class ApiService {
   }
 
   Future<List<NewsItem>> getCachedPromptResponses() async {
-    final box = Hive.box('promptResponses');
-    return box.get('allPromptResponses', defaultValue: <NewsItem>[]).cast<NewsItem>();
+    return await dbHelper.getPromptResponses();
   }
 }

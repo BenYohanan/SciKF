@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:news_feeds/routes.dart';
+import 'package:news_feeds/services/DatabaseHelper.dart';
 import 'package:news_feeds/size_config.dart';
-
-import 'model/news_item.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(NewsItemAdapter());
-  await Hive.openBox('newsCache');
-  await Hive.openBox('promptResponses');
-  runApp(MyApp());
+  final dbHelper = DatabaseHelper();
+  await dbHelper.database;
+  runApp(MyApp(dbHelper: dbHelper));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final DatabaseHelper dbHelper;
+  const MyApp({super.key, required this.dbHelper});
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    return MaterialApp(
-      title: 'News Feeds',
-        theme: ThemeData(
-          primarySwatch: createMaterialColor(Color(0xFF2E7D32)),
-          primaryColor: Color(0xFF2E7D32),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          textTheme: Theme.of(context).textTheme.apply(
-              fontFamily: 'Roboto'),
-        ),
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
-      routes: getRoutes()
+    return Builder(
+      builder: (context) {
+        SizeConfig().init(context);
+        return MaterialApp(
+          title: 'News Feeds',
+          theme: ThemeData(
+            primarySwatch: createMaterialColor(Color(0xFF2E7D32)),
+            primaryColor: Color(0xFF2E7D32),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            textTheme: Theme.of(context).textTheme.apply(fontFamily: 'Roboto'),
+          ),
+          debugShowCheckedModeBanner: false,
+          initialRoute: '/',
+          routes: getRoutes(),
+        );
+      },
     );
   }
+
   MaterialColor createMaterialColor(Color color) {
     List strengths = <double>[.05];
     Map<int, Color> swatch = {};
@@ -54,4 +54,3 @@ class MyApp extends StatelessWidget {
     return MaterialColor(color.value, swatch);
   }
 }
-

@@ -1,36 +1,43 @@
-import 'package:hive/hive.dart';
-part 'news_item.g.dart';
-
-@HiveType(typeId: 0)
 class NewsItem {
-  @HiveField(0)
   final String title;
-
-  @HiveField(1)
   final String summary;
-
-  @HiveField(2)
   final String details;
-
-  @HiveField(3)
-  final String? sourceUrl;
-
-  @HiveField(4)
-  final String? date;
-
-  @HiveField(5)
+  final String sourceUrl;
+  final String source;
+  final String date;
   final String responseType;
-
-  @HiveField(6)
-  final String? source;
 
   NewsItem({
     required this.title,
     required this.summary,
     required this.details,
-    this.sourceUrl,
-    this.source,
+    required this.sourceUrl,
+    required this.source,
     required this.date,
-    this.responseType = 'news',
+    required this.responseType,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'summary': summary,
+      'details': details,
+      'sourceUrl': sourceUrl,
+      'source': source,
+      'date': date,
+      'responseType': responseType,
+    };
+  }
+
+  factory NewsItem.fromMap(Map<String, dynamic> map) {
+    return NewsItem(
+      title: map['title'] ?? '',
+      summary: map['summary'] ?? '',
+      details: map['details'] ?? '',
+      sourceUrl: map['sourceUrl'] ?? '',
+      source: map['source'] ?? '',
+      date: map['date'] ?? '',
+      responseType: map['responseType'] ?? '',
+    );
+  }
 }

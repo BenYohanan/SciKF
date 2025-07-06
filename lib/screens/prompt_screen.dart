@@ -2,22 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/size_config.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
-import '../services/api_service.dart';
-import '../widgets/custom_app_bar.dart';
-import '../widgets/custom_bottom_nav_bar.dart';
-import '../widgets/custom_suffix_icon.dart';
-import '../widgets/widget_helper.dart';
+import 'package:news_feeds/services/api_service.dart';
+import 'package:news_feeds/widgets/custom_app_bar.dart';
+import 'package:news_feeds/widgets/custom_bottom_nav_bar.dart';
+import 'package:news_feeds/widgets/custom_suffix_icon.dart';
+import 'package:news_feeds/widgets/widget_helper.dart';
+import '../services/DatabaseHelper.dart';
 import 'home/Components/news_detail_screen.dart';
 
 class PromptScreen extends StatefulWidget {
+  final DatabaseHelper dbHelper;
+  const PromptScreen({super.key, required this.dbHelper});
+
   @override
   _PromptScreenState createState() => _PromptScreenState();
 }
 
 class _PromptScreenState extends State<PromptScreen> {
   final TextEditingController _controller = TextEditingController();
-  final ApiService _apiService = ApiService();
-  String? _response;
+  late final ApiService _apiService;
+
+  @override
+  void initState() {
+    super.initState();
+    _apiService = ApiService(widget.dbHelper);
+  }
+
+  Future<void> _submitPrompt() async {
+    if (_controller.text.isEmpty) {
+      Dialogs.flushBar(context, "Error", 'Please enter a prompt');
+      return;
+    }
+
+    Dialogs.loader(context);
+    FocusScope.of(context).unfocus();
+
+    try {
+      final responseData = await _apiService.answerPrompt(_controller.text);
+      Navigator.of(context, rootNavigator: true).pop(); // Close loader
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewsDetailScreen(newsItem: responseData),
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop(); // Close loader
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,39 +85,22 @@ class _PromptScreenState extends State<PromptScreen> {
                 Text(
                   "Have a question or need help with something?\nJust type it below and we'll do the rest.",
                   textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: getProportionateScreenHeight(15), color: Colors.grey[700]),
+                  style: TextStyle(
+                    fontSize: getProportionateScreenHeight(15),
+                    color: Colors.grey[700],
+                  ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(30)),
                 TextFormField(
                   cursorColor: kPrimaryColor,
-                  maxLines: 4,
+                  maxLines: 7,
                   controller: _controller,
                   decoration: WidgetHelper().buildInputDecoration("Prompt", "Enter text"),
                   onChanged: (_) => setState(() {}),
                 ),
-                SizedBox(height: getProportionateScreenHeight(300)),
+                SizedBox(height: getProportionateScreenHeight(250)),
                 GestureDetector(
-                  onTap:() async {
-                    Dialogs.loader(context);
-                    FocusScope.of(context).unfocus();
-                    setState(() {
-                      _response = null;
-                    });
-                    try {
-                      final responseData =
-                      await _apiService.answerPrompt(_controller.text);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NewsDetailScreen(newsItem: responseData),
-                        ),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
-                      );
-                    }
-                  },
+                  onTap: _submitPrompt,
                   child: Container(
                     height: getProportionateScreenHeight(50),
                     width: screenWidth,
@@ -117,10 +135,15 @@ class _PromptScreenState extends State<PromptScreen> {
               ],
             ),
           ),
-
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar()
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

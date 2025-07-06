@@ -10,9 +10,31 @@ class CustomBottomNavBar extends StatefulWidget {
   State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
 
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
+class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware {
   int _selectedIndex = 0;
   bool _isNavigating = false;
+  final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPush() => _updateSelectedIndex();
+  @override
+  void didPopNext() => _updateSelectedIndex();
+  @override
+  void didPushNext() => _updateSelectedIndex();
+  @override
+  void didPop() => _updateSelectedIndex();
 
   @override
   void initState() {
@@ -58,16 +80,17 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           break;
         case 1:
           if (ModalRoute.of(context)?.settings.name != '/prompt') {
-            await Navigator.pushNamed(context, '/prompt');
+            await Navigator.pushReplacementNamed(context, '/prompt');
           }
           break;
         case 2:
           if (ModalRoute.of(context)?.settings.name != '/response') {
-            await Navigator.pushNamed(context, '/response');
+            await Navigator.pushReplacementNamed(context, '/response');
           }
           break;
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Navigation error: $e');
     } finally {
       if (mounted) {
         setState(() => _isNavigating = false);
@@ -77,10 +100,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateSelectedIndex();
-    });
-
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
@@ -104,7 +123,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           activeIcon: SvgPicture.asset(
             "assets/icons/home.svg",
             height: getProportionateScreenHeight(20),
-            color: kPrimaryColor, // Highlight selected icon
+            color: kPrimaryColor,
           ),
           label: 'Home',
         ),
@@ -116,7 +135,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           activeIcon: SvgPicture.asset(
             "assets/icons/Prompt.svg",
             height: getProportionateScreenHeight(20),
-            color: kPrimaryColor, // Highlight selected icon
+            color: kPrimaryColor,
           ),
           label: 'Prompt',
         ),
@@ -128,7 +147,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
           activeIcon: SvgPicture.asset(
             "assets/icons/View.svg",
             height: getProportionateScreenHeight(20),
-            color: kPrimaryColor, // Highlight selected icon
+            color: kPrimaryColor,
           ),
           label: 'Findings',
         ),

@@ -1,39 +1,77 @@
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import '../model/news_item.dart';
+import '../services/DatabaseHelper.dart';
 import '../services/api_service.dart';
 import '../size_config.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../widgets/dialogs.dart';
 import 'home/Components/news_detail_screen.dart';
 
-class ResponseListScreen extends StatelessWidget {
-  final ApiService _apiService = ApiService();
+class ResponseListScreen extends StatefulWidget {
+  final DatabaseHelper dbHelper;
+  const ResponseListScreen({super.key, required this.dbHelper});
+  @override
+  State<ResponseListScreen> createState() => _ResponseListScreenState();
+}
+
+class _ResponseListScreenState extends State<ResponseListScreen> {
+  late Future<List<NewsItem>> _newsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _newsFuture = ApiService(widget.dbHelper).getCachedPromptResponses();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[200],
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
         child: CustomAppBar(fullName: "User", isOnline: true),
       ),
       body: FutureBuilder<List<NewsItem>>(
-        future: _apiService.getCachedPromptResponses(),
+        future: _newsFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No prompt yet'));
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.connectionState == ConnectionState.active) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Dialogs.loader(context);
+            });
+            return const SizedBox.shrink();
           }
-          final news = snapshot.data!;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context, rootNavigator: true).pop();
+          });
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Failed to load news: ${snapshot.error}',
+                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
+              ),
+            );
+          }
+
+          final newsItems = snapshot.data ?? [];
+          if (newsItems.isEmpty) {
+            return Center(
+              child: Text(
+                'No prompt yet!',
+                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
+              ),
+            );
+          }
+
           return ListView.builder(
             padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-            itemCount: news.length,
+            itemCount: newsItems.length,
             itemBuilder: (context, index) {
-              final newsItem = news[index];
+              final newsItem = newsItems[index];
               return GestureDetector(
                 onTap: () => Navigator.push(
                   context,
@@ -75,19 +113,19 @@ class ResponseListScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              newsItem.date!,
+                              newsItem.date,
                               style: TextStyle(
                                 fontSize: getProportionateScreenWidth(14),
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryColor, // Nigerian green
+                                color: kPrimaryColor,
                               ),
                             ),
                             Text(
-                              newsItem.source ?? 'AI Generated',
+                              newsItem.source,
                               style: TextStyle(
                                 fontSize: getProportionateScreenWidth(12),
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryColor, // Nigerian green
+                                color: kPrimaryColor,
                               ),
                             ),
                           ],
@@ -111,7 +149,7 @@ class ResponseListScreen extends StatelessWidget {
           );
         },
       ),
-        bottomNavigationBar: CustomBottomNavBar()
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }
