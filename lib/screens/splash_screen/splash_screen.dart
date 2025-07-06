@@ -16,7 +16,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    ApiService().fetchScienceNews();
+    _fetchData();
+  }
+  Future<void> _fetchData() async {
+    await ApiService().fetchScienceNews();
   }
   @override
   Widget build(BuildContext context) {
