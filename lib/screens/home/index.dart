@@ -1,4 +1,3 @@
-// screens/home/index.dart
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import '../../model/news_item.dart';
@@ -9,6 +8,7 @@ import '../../widgets/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
 import '../../widgets/dialogs.dart';
 import 'Components/news_detail_screen.dart';
+import '../../widgets/scaffold_wrapper.dart';
 
 class HomeScreen extends StatefulWidget {
   final DatabaseHelper dbHelper;
@@ -29,12 +29,12 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
+    return ScaffoldWrapper(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
         child: CustomAppBar(fullName: "User", isOnline: true),
       ),
+      bottomNavigationBar: const CustomBottomNavBar(),
       body: FutureBuilder<List<NewsItem>>(
         future: _newsFuture,
         builder: (context, snapshot) {
@@ -151,7 +151,6 @@ class HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
-      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }

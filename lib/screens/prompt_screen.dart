@@ -39,7 +39,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
     try {
       final responseData = await _apiService.answerPrompt(_controller.text);
-      Navigator.of(context, rootNavigator: true).pop(); // Close loader
+      Navigator.of(context, rootNavigator: true).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -47,10 +47,8 @@ class _PromptScreenState extends State<PromptScreen> {
         ),
       );
     } catch (e) {
-      Navigator.of(context, rootNavigator: true).pop(); // Close loader
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      Navigator.of(context, rootNavigator: true).pop();
+      Dialogs.flushBar(context, "Error", 'Please enter a prompt');
     }
   }
 
@@ -73,7 +71,7 @@ class _PromptScreenState extends State<PromptScreen> {
               children: [
                 SizedBox(height: getProportionateScreenHeight(30)),
                 Text(
-                  "Ask Anything",
+                  "Ask SciKF",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: getProportionateScreenWidth(24),
@@ -83,14 +81,14 @@ class _PromptScreenState extends State<PromptScreen> {
                 ),
                 SizedBox(height: getProportionateScreenHeight(15)),
                 Text(
-                  "Have a question or need help with something?\nJust type it below and we'll do the rest.",
-                  textAlign: TextAlign.left,
+                  'Ask SciKF questions about inventions in Healthcare, Agriculture, and Health Sciences. SciKF is currently tailored to address questions in these aforementioned domains.',
+                  textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(15),
                     color: Colors.grey[700],
                   ),
                 ),
-                SizedBox(height: getProportionateScreenHeight(30)),
+                SizedBox(height: getProportionateScreenHeight(20)),
                 TextFormField(
                   cursorColor: kPrimaryColor,
                   maxLines: 7,
@@ -98,7 +96,6 @@ class _PromptScreenState extends State<PromptScreen> {
                   decoration: WidgetHelper().buildInputDecoration("Prompt", "Enter text"),
                   onChanged: (_) => setState(() {}),
                 ),
-                SizedBox(height: getProportionateScreenHeight(250)),
                 GestureDetector(
                   onTap: _submitPrompt,
                   child: Container(
@@ -113,11 +110,6 @@ class _PromptScreenState extends State<PromptScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          custom_suffix_icon(
-                            svgIcon: "assets/icons/Send.svg",
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: getProportionateScreenWidth(2)),
                           Text(
                             "Submit prompt",
                             style: TextStyle(

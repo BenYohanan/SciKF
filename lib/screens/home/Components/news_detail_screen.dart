@@ -46,7 +46,7 @@ class NewsDetailScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Source: ${newsItem.source ?? "AI Generated"}',
+                  'Source: ${newsItem.source ?? "SciKF"}',
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(12),
                     color: kPrimaryColor,
@@ -95,12 +95,12 @@ class NewsDetailScreen extends StatelessWidget {
                 ),
               ),
             ],
-            if (newsItem.sourceUrl != null && newsItem.sourceUrl!.isNotEmpty) ...[
+            if (newsItem.source != "SciKF" && newsItem.sourceUrl != null && newsItem.sourceUrl.isNotEmpty) ...[
               SizedBox(height: getProportionateScreenHeight(16)),
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () async {
-                    final url = Uri.parse(newsItem.sourceUrl!);
+                    final url = Uri.parse(newsItem.sourceUrl);
                     if (await canLaunchUrl(url)) {
                       await launchUrl(url, mode: LaunchMode.externalApplication);
                     } else {
