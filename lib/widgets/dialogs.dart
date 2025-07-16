@@ -11,7 +11,7 @@ class Dialogs {
       ) {
     return Flushbar(
       margin: EdgeInsets.all(getProportionateScreenHeight(4)),
-      backgroundColor: kPrimaryColor,
+      backgroundColor: primaryColor,
       titleText: Text(
         title,
         textAlign: TextAlign.center,
@@ -46,7 +46,7 @@ class Dialogs {
       child: Text(
         label,
         style: TextStyle(
-          color: kPrimaryColor,
+          color: primaryColor,
           fontWeight: FontWeight.w900,
           fontSize: getProportionateScreenWidth(20),
         ),

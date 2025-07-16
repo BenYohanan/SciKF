@@ -12,7 +12,7 @@ class WidgetHelper {
   }) {
     return TextButton(
       style: TextButton.styleFrom(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         shape: RoundedRectangleBorder(
@@ -48,10 +48,10 @@ class WidgetHelper {
         ),
         border: OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: kPrimaryColor),
+          borderSide: BorderSide(color: primaryColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: kPrimaryColor),
+          borderSide: BorderSide(color: primaryColor),
         ),
       ),
     );
@@ -64,9 +64,9 @@ class WidgetHelper {
       floatingLabelBehavior: FloatingLabelBehavior.always,
       border: const OutlineInputBorder(),
       enabledBorder:
-          OutlineInputBorder(borderSide: BorderSide(color: kPrimaryColor)),
+          OutlineInputBorder(borderSide: BorderSide(color: primaryColor)),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: kPrimaryColor),
+        borderSide: BorderSide(color: primaryColor),
       ),
       hintStyle: TextStyle(
         color: Colors.grey.shade500,
@@ -134,8 +134,10 @@ class WidgetHelper {
       onChanged: onChanged,
       onTap: onTap,
       maxLines: maxLines,
+      cursorColor: primaryColor,
       decoration: buildInputDecoration(label, placeHolder),
       validator: validator,
+
     );
   }
 }

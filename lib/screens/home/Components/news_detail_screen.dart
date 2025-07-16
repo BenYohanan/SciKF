@@ -3,8 +3,8 @@ import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/size_config.dart';
 import '../../../model/news_item.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../widgets/custom_app_bar.dart';
-import '../../../widgets/custom_bottom_nav_bar.dart';
+import '../../../components/custom_app_bar.dart';
+import '../../../components/custom_bottom_nav_bar.dart';
 import '../../../widgets/dialogs.dart';
 
 class NewsDetailScreen extends StatelessWidget {
@@ -15,10 +15,9 @@ class NewsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
-        child: const CustomAppBar(fullName: "User", isOnline: true),
+        child: const CustomAppBar(),
       ),
       body: Padding(
         padding: EdgeInsets.all(getProportionateScreenWidth(16)),
@@ -41,7 +40,7 @@ class NewsDetailScreen extends StatelessWidget {
                   'Date: ${newsItem.date}',
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(15),
-                    color: kPrimaryColor,
+                    color: primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -49,7 +48,7 @@ class NewsDetailScreen extends StatelessWidget {
                   'Source: ${newsItem.source ?? "SciKF"}',
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(12),
-                    color: kPrimaryColor,
+                    color: primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -122,7 +121,7 @@ class NewsDetailScreen extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white, // For ripple effect
                     padding: EdgeInsets.symmetric(
                       horizontal: getProportionateScreenWidth(24),

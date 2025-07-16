@@ -3,8 +3,8 @@ import 'package:news_feeds/constants.dart';
 import '../../model/news_item.dart';
 import '../../services/DatabaseHelper.dart';
 import '../../services/api_service.dart';
-import '../../widgets/custom_app_bar.dart';
-import '../../widgets/custom_bottom_nav_bar.dart';
+import '../../components/custom_app_bar.dart';
+import '../../components/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
 import '../../widgets/dialogs.dart';
 import 'Components/news_detail_screen.dart';
@@ -32,9 +32,8 @@ class HomeScreenState extends State<HomeScreen> {
     return ScaffoldWrapper(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
-        child: CustomAppBar(fullName: "User", isOnline: true),
+        child: CustomAppBar(),
       ),
-      bottomNavigationBar: const CustomBottomNavBar(),
       body: FutureBuilder<List<NewsItem>>(
         future: _newsFuture,
         builder: (context, snapshot) {
@@ -119,7 +118,7 @@ class HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: getProportionateScreenWidth(14),
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryColor,
+                                color: primaryColor,
                               ),
                             ),
                             Text(
@@ -127,7 +126,7 @@ class HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: getProportionateScreenWidth(12),
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryColor,
+                                color: primaryColor,
                               ),
                             ),
                           ],
@@ -151,6 +150,7 @@ class HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+      bottomNavigationBar: CustomBottomNavBar(),
     );
   }
 }
