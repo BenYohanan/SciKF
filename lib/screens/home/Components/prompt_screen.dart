@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/size_config.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
-import 'package:news_feeds/services/api_service.dart';
+import 'package:news_feeds/services/PromptService.dart';
 import 'package:news_feeds/components/custom_app_bar.dart';
 import 'package:news_feeds/components/custom_bottom_nav_bar.dart';
 import 'package:news_feeds/widgets/widget_helper.dart';
@@ -19,12 +19,12 @@ class PromptScreen extends StatefulWidget {
 
 class _PromptScreenState extends State<PromptScreen> {
   final TextEditingController _controller = TextEditingController();
-  late final ApiService _apiService;
+  late final PromptService _apiService;
 
   @override
   void initState() {
     super.initState();
-    _apiService = ApiService(widget.dbHelper);
+    _apiService = PromptService(widget.dbHelper);
   }
 
   Future<void> _submitPrompt() async {

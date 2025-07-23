@@ -43,7 +43,7 @@ class WidgetHelper {
           fontStyle: FontStyle.italic,
         ),
         labelStyle: TextStyle(
-          color: Colors.grey.shade700,
+          color: primaryColor,
           fontSize: getProportionateScreenHeight(14),
         ),
         border: OutlineInputBorder(),

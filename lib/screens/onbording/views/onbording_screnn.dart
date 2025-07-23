@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:news_feeds/size_config.dart';
+import 'package:provider/provider.dart';
 
 import '../../../components/dot_indicators.dart';
 import '../../../constants.dart';
+import '../../../providers/AuthProvider.dart';
 import '../../../route/route_constants.dart';
 import 'components/onbording_content.dart';
 
@@ -40,8 +42,16 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
 
   @override
   void initState() {
-    _pageController = PageController(initialPage: 0);
     super.initState();
+    _pageController = PageController(initialPage: 0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<SciKFProvider>(context, listen: false);
+      authProvider.loadUserData().then((_) {
+        if (authProvider.user != null) {
+          Navigator.pushReplacementNamed(context, mainScreenRoute);
+        }
+      });
+    });
   }
 
   @override

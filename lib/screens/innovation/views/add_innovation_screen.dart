@@ -1,10 +1,14 @@
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
+import 'package:news_feeds/services/BaseHelperService.dart';
 import 'package:news_feeds/size_config.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
-import 'package:news_feeds/services/api_service.dart';
 import 'package:news_feeds/widgets/widget_helper.dart';
-import '../../../components/file_upload_update.dart';
+import 'package:provider/provider.dart';
+import '../../../model/innovationDTO.dart';
+import '../../../providers/AuthProvider.dart';
 import '../../../route/route_constants.dart';
 import '../../../services/DatabaseHelper.dart';
 import '../../../components/custom_app_bar.dart';
@@ -20,27 +24,74 @@ class PostInnovationScreen extends StatefulWidget {
 }
 
 class _PostInnovationScreenState extends State<PostInnovationScreen> {
-  final TextEditingController _controller = TextEditingController();
-  late final ApiService _apiService;
+  final TextEditingController _summaryController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  BaseHelperService baseHelperService = BaseHelperService();
+  InnovationDTO innovation = InnovationDTO(
+    displayImage: '',
+    title: '',
+    summary: '',
+    category: Category.Select,
+    authorId: "",
+    file: '',
+  );
+  String? _fileName, _fileNameForDisplayImage;
+  PlatformFile? _selectedFile, _selectedFileForDisplayImage;
 
-  @override
-  void initState() {
-    super.initState();
-    _apiService = ApiService(widget.dbHelper);
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'png', 'doc', 'docx'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _selectedFile = result.files.first;
+        _fileName = _selectedFile!.name;
+        innovation.file = _selectedFile!.path;
+      });
+    }
+  }
+  Future<void> _pickDisplayImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png', 'jpeg'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _selectedFileForDisplayImage = result.files.first;
+        _fileNameForDisplayImage = _selectedFileForDisplayImage!.name;
+        innovation.displayImage = _selectedFileForDisplayImage!.path;
+      });
+    }
   }
 
-  Future<void> _submitPrompt() async {
-    if (_controller.text.isEmpty) {
-      Dialogs.flushBar(context, "Error", 'Please enter a prompt');
+  Future<void> _save() async {
+    if (innovation.title!.isEmpty || innovation.summary!.isEmpty) {
+        Dialogs.flushBar(context, 'Error', 'Please fill in all fields');
+        return;
+    }
+    Dialogs.loader(context);
+    var saveInnovation = await baseHelperService.createInnovation(innovation, _selectedFile, _selectedFileForDisplayImage);
+    if(!saveInnovation){
+      Navigator.pop(context);
+      Dialogs.flushBar(context, 'Error', 'Unable to save innovation');
       return;
     }
-
-    Dialogs.loader(context);
-    FocusScope.of(context).unfocus();
+    if(mounted){
+      Navigator.pop(context);
+      Navigator.pushNamed(context, addedForReviewMessageScreenRoute);
+      Dialogs.flushBar(context, 'Success', 'Innovation submitted for review');
+    } else {
+      Dialogs.flushBar(context, 'Error', 'Unable to submit innovation');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<SciKFProvider>(context);
+    final user = authProvider.user;
     double screenWidth = SizeConfig.screenWidth;
     return Scaffold(
       appBar: PreferredSize(
@@ -55,7 +106,7 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
             padding: EdgeInsets.all(getProportionateScreenHeight(10)),
             child: Column(
               children: [
-                SizedBox(height: getProportionateScreenHeight(130)),
+                SizedBox(height: getProportionateScreenHeight(100)),
                 Text(
                   "Post an Innovation",
                   textAlign: TextAlign.center,
@@ -67,25 +118,93 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 WidgetHelper().buildTextField(
-                  controller: _controller,
+                  controller: _titleController,
                   label: "Innovation Title",
                   placeHolder: "Enter title",
-                  onChanged: (_) => setState(() {}),
+                  onChanged: (_) => setState(() {
+                    innovation.title = _titleController.text;
+                  }),
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 WidgetHelper().buildTextField(
-                  controller: _controller,
+                  controller: _summaryController,
                   label: "Description",
                   maxLines: 5,
                   placeHolder: "Enter description",
-                  onChanged: (_) => setState(() {}),
+                  onChanged: (_) => setState(() {
+                    innovation.summary = _summaryController.text;
+                  }),
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
-                FileUploadWidget(),
-                GestureDetector(
-                  onTap: () async {
-                    Navigator.pushNamed(context, addedForReviewMessageScreenRoute);
+                DropdownSearch<Category>(
+                  popupProps: PopupProps.menu(showSearchBox: true, fit: FlexFit.loose),
+                  dropdownDecoratorProps: WidgetHelper().dropDownDecoratorProps("Category"),
+                  items: Category.values,
+                  itemAsString: (Category status) => status.displayName,
+                  onChanged: (Category? value) {
+                    setState(() {
+                      innovation.category = value;
+                    });
                   },
+                  selectedItem: innovation.category,
+                ),
+                SizedBox(height: getProportionateScreenHeight(10)),
+                InkWell(
+                  onTap: _pickFile,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _fileName ?? "Upload Document/Picture/Research Paper",
+                            style: TextStyle(
+                              color: _fileName == null ? Colors.grey : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(Icons.attach_file, color: Colors.grey),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: getProportionateScreenHeight(10)),
+                InkWell(
+                  onTap: _pickDisplayImage,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _fileNameForDisplayImage ?? "Upload Display Picture",
+                            style: TextStyle(
+                              color: _fileNameForDisplayImage == null ? Colors.grey : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(Icons.attach_file, color: Colors.grey),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap:() async {
+                    innovation.authorId = user!.id;
+                    await _save();
+                  } ,
                   child: Container(
                     height: getProportionateScreenHeight(50),
                     width: screenWidth,
@@ -125,7 +244,8 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _titleController.dispose();
+    _summaryController.dispose();
     super.dispose();
   }
 }

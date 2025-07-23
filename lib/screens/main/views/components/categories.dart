@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:news_feeds/size_config.dart';
 
 import '../../../../constants.dart';
 
@@ -14,7 +15,7 @@ class CategoryModel {
   });
 }
 
-List<CategoryModel> demoCategories = [
+List<CategoryModel> categories = [
   CategoryModel(name: "All Categories"),
   CategoryModel(name: "Health Care",svgSrc: "assets/icons/Health.svg"),
   CategoryModel(name: "Agriculture", svgSrc: "assets/icons/Agriculture.svg"),
@@ -33,19 +34,19 @@ class Categories extends StatelessWidget {
       child: Row(
         children: [
           ...List.generate(
-            demoCategories.length,
+            categories.length,
             (index) => Padding(
               padding: EdgeInsets.only(
-                  left: index == 0 ? defaultPadding : defaultPadding / 2,
+                  left: index == 0 ? getProportionateScreenHeight(16) : getProportionateScreenHeight(8),
                   right:
-                      index == demoCategories.length - 1 ? defaultPadding : 0),
+                      index == categories.length - 1 ? getProportionateScreenHeight(16) : 0),
               child: CategoryBtn(
-                category: demoCategories[index].name,
-                svgSrc: demoCategories[index].svgSrc,
+                category: categories[index].name,
+                svgSrc: categories[index].svgSrc,
                 isActive: index == 0,
                 press: () {
-                  if (demoCategories[index].route != null) {
-                    Navigator.pushNamed(context, demoCategories[index].route!);
+                  if (categories[index].route != null) {
+                    Navigator.pushNamed(context, categories[index].route!);
                   }
                 },
               ),
@@ -75,10 +76,10 @@ class CategoryBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: press,
-      borderRadius: const BorderRadius.all(Radius.circular(30)),
+      borderRadius: BorderRadius.all(Radius.circular(getProportionateScreenHeight(30))),
       child: Container(
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+        height: getProportionateScreenHeight(36),
+        padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(16)),
         decoration: BoxDecoration(
           color: isActive ? primaryColor : Colors.transparent,
           border: Border.all(
@@ -92,17 +93,17 @@ class CategoryBtn extends StatelessWidget {
             if (svgSrc != null)
               SvgPicture.asset(
                 svgSrc!,
-                height: 20,
+                height: getProportionateScreenHeight(20),
                 colorFilter: ColorFilter.mode(
                   isActive ? Colors.white : Theme.of(context).iconTheme.color!,
                   BlendMode.srcIn,
                 ),
               ),
-            if (svgSrc != null) const SizedBox(width: defaultPadding / 2),
+            if (svgSrc != null) SizedBox(width: getProportionateScreenWidth(8)),
             Text(
               category,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: getProportionateScreenHeight(12),
                 fontWeight: FontWeight.w500,
                 color: isActive
                     ? Colors.white

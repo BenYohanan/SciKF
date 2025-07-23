@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
+import '../providers/AuthProvider.dart';
 import '../route/route_constants.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
-  const CustomBottomNavBar({Key? key}) : super(key: key);
-
+  CustomBottomNavBar({ super.key});
   @override
   State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
@@ -13,7 +14,6 @@ class CustomBottomNavBar extends StatefulWidget {
 class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware {
   final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
   int _currentIndex = 0;
-
 
   void _navigateToScreen(int index) {
     setState(() {
@@ -25,7 +25,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware
         mainScreenRoute,
         homeScreenRoute,
         promptScreenRoute,
-        responseScreenRoute,
+        approvedInnovationsScreenRoute,
         profileScreenRoute,
       ][index],
     );
@@ -34,6 +34,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<SciKFProvider>(context);
+    final user = authProvider.user;
     SvgPicture svgIcon(String src, {Color? color}) {
       return SvgPicture.asset(
         src,
@@ -84,13 +86,14 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware
           BottomNavigationBarItem(
             icon: svgIcon("assets/icons/Bookmark.svg"),
             activeIcon: svgIcon("assets/icons/Bookmark.svg", color: primaryColor),
-            label: "Findings",
+            label: "Innovations",
           ),
-          BottomNavigationBarItem(
-            icon: svgIcon("assets/icons/Profile.svg"),
-            activeIcon: svgIcon("assets/icons/Profile.svg", color: primaryColor),
-            label: "Profile",
-          ),
+        if (user!.id!.isNotEmpty)
+            BottomNavigationBarItem(
+              icon: svgIcon("assets/icons/Profile.svg"),
+              activeIcon: svgIcon("assets/icons/Profile.svg", color: primaryColor),
+              label: "Profile",
+            ),
         ],
       ),
     );

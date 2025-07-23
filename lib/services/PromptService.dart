@@ -4,12 +4,12 @@ import 'package:crypto/crypto.dart';
 import '../model/news_item.dart';
 import 'DatabaseHelper.dart';
 
-class ApiService {
+class PromptService {
   static const String apiKey = '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';
   static const String endpoint = 'https://api.openai.com/v1/chat/completions';
   final DatabaseHelper dbHelper;
 
-  ApiService(this.dbHelper);
+  PromptService(this.dbHelper);
 
   Future<List<NewsItem>> fetchScienceNews() async {
     final cachedTimestamp = await dbHelper.getTimestamp('scienceNewsTimestamp');

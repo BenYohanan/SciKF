@@ -1,18 +1,29 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:news_feeds/services/StorageService.dart';
 import 'package:news_feeds/size_config.dart';
+import 'package:provider/provider.dart';
 import '../../../constants.dart';
+import '../../../providers/AuthProvider.dart';
 import '../../../route/route_constants.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
 import 'components/profile_card.dart';
 import 'components/profile_menu_item_list_tile.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<SciKFProvider>(context);
+    final user = authProvider.user;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
@@ -21,9 +32,9 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         children: [
           ProfileCard(
-            name: "SciKF Admin",
-            email: "admin@scikf.com",
-            imageSrc: "https://i.imgur.com/IXnwbLk.png",
+            name: user!.fullName ?? "",
+            email: user.email ?? "",
+            imageSrc: user.profilePicture ?? "",
             press: () {
               Navigator.pushNamed(context, userInfoScreenRoute);
             },
@@ -32,7 +43,16 @@ class ProfileScreen extends StatelessWidget {
           ProfileMenuListTile(
             text: "My Innovations",
             svgSrc: "assets/icons/Innovations.svg",
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, myInnovationScreenRoute);
+            },
+          ),
+          ProfileMenuListTile(
+            text: "My Research",
+            svgSrc: "assets/icons/Innovations.svg",
+            press: () {
+              Navigator.pushNamed(context, researchScreenRoute);
+            },
           ),
           ProfileMenuListTile(
             text: "Post an innovations",
@@ -41,6 +61,15 @@ class ProfileScreen extends StatelessWidget {
               Navigator.pushNamed(context, postAnInnovationScreenRoute);
             },
           ),
+          if(user.isAdmin)...[
+            ProfileMenuListTile(
+              text: "Censorship Innovations",
+              svgSrc: "assets/icons/Censorship.svg",
+              press: () {
+                Navigator.pushNamed(context, censorshipInnovationsPageRoute);
+              },
+            ),
+          ],
           ProfileMenuListTile(
             text: "Change Password",
             svgSrc: "assets/icons/Lock.svg",
@@ -67,6 +96,8 @@ class ProfileScreen extends StatelessWidget {
             text: "Log Out",
             svgSrc: "assets/icons/Logout.svg",
             press: () {
+              StorageService().clearSecureStorage();
+              StorageService().wipeStorage();
               Navigator.pushNamed(context, logInScreenRoute);
             },
           ),

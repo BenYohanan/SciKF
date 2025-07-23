@@ -2,27 +2,27 @@ import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import '../../../model/news_item.dart';
 import '../../../services/DatabaseHelper.dart';
-import '../../../services/api_service.dart';
+import '../../../services/PromptService.dart';
 import '../../../size_config.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
 import '../../../widgets/dialogs.dart';
 import 'news_detail_screen.dart';
 
-class ResponseListScreen extends StatefulWidget {
+class ResearchListScreen extends StatefulWidget {
   final DatabaseHelper dbHelper;
-  const ResponseListScreen({super.key, required this.dbHelper});
+  const ResearchListScreen({super.key, required this.dbHelper});
   @override
-  State<ResponseListScreen> createState() => _ResponseListScreenState();
+  State<ResearchListScreen> createState() => _ResearchListScreenState();
 }
 
-class _ResponseListScreenState extends State<ResponseListScreen> {
+class _ResearchListScreenState extends State<ResearchListScreen> {
   late Future<List<NewsItem>> _newsFuture;
 
   @override
   void initState() {
     super.initState();
-    _newsFuture = ApiService(widget.dbHelper).getCachedPromptResponses();
+    _newsFuture = PromptService(widget.dbHelper).getCachedPromptResponses();
   }
 
   @override
@@ -148,7 +148,7 @@ class _ResponseListScreenState extends State<ResponseListScreen> {
           );
         },
       ),
-      bottomNavigationBar: const CustomBottomNavBar(),
+      bottomNavigationBar: CustomBottomNavBar(),
     );
   }
 }

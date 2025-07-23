@@ -21,13 +21,20 @@ class ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: press,
-      leading: CircleAvatar(
-        radius: getProportionateScreenHeight(30),
-        child: NetworkImageWithLoader(
-          imageSrc,
-          radius: 100,
+        leading: CircleAvatar(
+          radius: getProportionateScreenHeight(30),
+          backgroundColor: Colors.grey[200],
+          child: imageSrc.isNotEmpty
+              ? NetworkImageWithLoader(
+            imageSrc,
+            radius: 100,
+          )
+              : Icon(
+            Icons.person,
+            size: getProportionateScreenHeight(40),
+            color: primaryColor,
+          ),
         ),
-      ),
       title: Row(
         children: [
           Text(

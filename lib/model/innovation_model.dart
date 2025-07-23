@@ -1,14 +1,52 @@
 import '../constants.dart';
 
 class InnovationModel {
+  int? id;
   final String image, author, title, category;
+  final String? status, date, fileUrl, authorEmail, summary;
 
   InnovationModel({
+    this.id,
     required this.image,
     required this.author,
     required this.title,
     required this.category,
+    this.status,
+    this.date,
+    this.fileUrl,
+    this.authorEmail,
+    this.summary,
   });
+
+  factory InnovationModel.fromJson(Map<String, dynamic> json) {
+    return InnovationModel(
+      id: json['id'] as int?,
+      author: json['author'] as String,
+      category: json['category'] as String,
+      title: json['title'] as String,
+      fileUrl: json['file'] as String?,
+      image: json['displayImage'] as String,
+      status: json['status'] as String?,
+      date: json['dateCreated'] as String?,
+      summary: json['summary'] as String?,
+      authorEmail: json['authorEmail'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'image': image,
+      'author': author,
+      'title': title,
+      'category': category,
+      'status': status,
+      'date': date,
+      'fileUrl': fileUrl,
+      'summary': summary,
+      'authorEmail': authorEmail,
+    };
+  }
 }
 
 List<InnovationModel> recentInnovations = [

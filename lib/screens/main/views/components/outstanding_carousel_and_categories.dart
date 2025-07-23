@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/model/innovation_model.dart';
 
+import '../../../../components/skleton/others/categories_skelton.dart';
+import '../../../../components/skleton/others/offers_skelton.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 import 'categories.dart';
 import 'outstanding_carousel.dart';
 
 class OutstandingCarouselAndCategories extends StatelessWidget {
-  const OutstandingCarouselAndCategories({
+  OutstandingCarouselAndCategories({
     super.key,
+    required this.outstandingInnovation,
+    required this.isLoading
   });
-
+  List<InnovationModel>? outstandingInnovation = [];
+  bool isLoading;
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // While loading use 👇
-        // const OffersSkelton(),
+        isLoading ? const OffersSkelton() :
         const OutstandingCarousel(),
-        const SizedBox(height: defaultPadding / 2),
+        SizedBox(height: getProportionateScreenHeight(8)),
         Padding(
-          padding: const EdgeInsets.all(defaultPadding),
+          padding: EdgeInsets.all(getProportionateScreenHeight(16)),
           child: Text(
             "Categories",
             style: TextStyle(
@@ -30,8 +35,6 @@ class OutstandingCarouselAndCategories extends StatelessWidget {
             ),
           ),
         ),
-        // While loading use 👇
-        // const CategoriesSkelton(),
         const Categories(),
       ],
     );

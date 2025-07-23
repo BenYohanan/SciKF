@@ -41,19 +41,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     const SizedBox(height: defaultPadding),
                     SignUpForm(formKey: _formKey),
-                    const SizedBox(height: defaultPadding * 2),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, entryPointScreenRoute);
-                      },
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          fontSize: getProportionateScreenHeight(16),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

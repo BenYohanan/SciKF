@@ -39,39 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 LogInForm(formKey: _formKey),
-                Align(
-                  child: TextButton(
-                    child: Text(
-                      "Forgot password",
-                      style: TextStyle(
-                        fontSize: getProportionateScreenHeight(14),
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        passwordRecoveryScreenRoute,
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(height: getProportionateScreenHeight(20)),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.pushNamed(context, mainScreenRoute);
-                    }
-                  },
-                  child: Text(
-                    "Sign in",
-                    style: TextStyle(
-                      fontSize: getProportionateScreenHeight(16),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import '../../model/news_item.dart';
 import '../../services/DatabaseHelper.dart';
-import '../../services/api_service.dart';
+import '../../services/PromptService.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
@@ -24,7 +24,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _newsFuture = ApiService(widget.dbHelper).fetchScienceNews();
+    _newsFuture = PromptService(widget.dbHelper).fetchScienceNews();
   }
 
   @override

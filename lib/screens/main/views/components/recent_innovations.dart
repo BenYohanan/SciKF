@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:news_feeds/size_config.dart';
 
 import '../../../../components/innovation/innovation_card.dart';
+import '../../../../components/skleton/innovation/products_skelton.dart';
 import '../../../../constants.dart';
-import '../../../../model/product_model.dart';
+import '../../../../model/innovation_model.dart';
 import '../../../../route/route_constants.dart';
 
 class RecentInnovations extends StatelessWidget {
-  const RecentInnovations({
+  RecentInnovations({
     super.key,
+    required this.recentInnovation,
+    required this.isLoading
   });
-
+  List<InnovationModel>? recentInnovation = [];
+  bool isLoading;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -18,7 +22,7 @@ class RecentInnovations extends StatelessWidget {
       children: [
         SizedBox(height: getProportionateScreenHeight(20)),
         Padding(
-          padding: const EdgeInsets.all(defaultPadding),
+          padding: EdgeInsets.all(getProportionateScreenHeight(16)),
           child: Text(
             "Top Picks",
             style: TextStyle(
@@ -28,8 +32,7 @@ class RecentInnovations extends StatelessWidget {
             ),
           ),
         ),
-        // While loading use 👇
-        // const ProductsSkelton(),
+        isLoading ? const ProductsSkelton() :
         SizedBox(
           height: getProportionateScreenHeight(270),
           child: ListView.builder(
@@ -39,7 +42,7 @@ class RecentInnovations extends StatelessWidget {
               padding: EdgeInsets.only(
                 left: defaultPadding,
                 right: index == recentInnovations.length - 1
-                    ? defaultPadding
+                    ? getProportionateScreenHeight(16)
                     : 0,
               ),
               child: InnovationCard(

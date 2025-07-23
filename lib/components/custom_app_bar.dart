@@ -162,7 +162,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Scaffold.of(context).openDrawer();
             },
             icon: SvgPicture.asset(
-              "assets/icons/Menu.svg",
+              "assets/icons/Login.svg",
               height: 24,
               color: primaryColor,
             ),
