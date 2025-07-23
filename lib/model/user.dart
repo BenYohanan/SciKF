@@ -23,7 +23,9 @@ class ApplicationUser {
       profilePicture: json['profilePicture'] == null
           ? ""
           : json['profilePicture'].toString(),
-      phoneNumber: json['phoneNumber'],
+      phoneNumber:json['phoneNumber'] == null
+          ? ""
+          : json['phoneNumber'].toString(),
       isAdmin: json['isAdmin'] ?? false,
     );
   }

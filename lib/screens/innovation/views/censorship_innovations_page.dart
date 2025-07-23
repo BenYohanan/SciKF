@@ -11,6 +11,7 @@ import '../../../services/StorageService.dart';
 import '../../../services/storage_keys.dart';
 import '../../../size_config.dart';
 import '../../../widgets/dialogs.dart';
+import 'innovation_details_screen.dart';
 
 class CensorshipInnovationsScreen extends StatefulWidget {
   const CensorshipInnovationsScreen({super.key});

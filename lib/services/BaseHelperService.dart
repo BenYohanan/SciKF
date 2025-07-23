@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_feeds/services/storage_keys.dart';
@@ -170,50 +171,73 @@ class BaseHelperService {
       throw Exception('Failed to fetch innovation: ${response.body}');
     }
   }
-
   Future<bool> createInnovation(InnovationDTO innovation, PlatformFile? file, PlatformFile? image) async {
-    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/Innovation/SaveInnovation'));
-    request.fields['Title'] = innovation.title!;
-    request.fields['Summary'] = innovation.summary!;
-    request.fields['Category'] = innovation.category!.displayName;
-    request.fields['AuthorId'] = innovation.authorId!;
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/Innovation/SaveInnovation'));
+      request.fields['Title'] = innovation.title ?? '';
+      request.fields['Summary'] = innovation.summary ?? '';
+      request.fields['Category'] = innovation.category?.displayName ?? '';
+      request.fields['AuthorId'] = innovation.authorId ?? '';
 
-    if (file != null && file.bytes != null) {
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'File',
-          file.bytes!,
-          filename: file.name,
-        ),
-      );
-    }
+      if (file != null) {
+        if (kIsWeb && file.bytes != null && file.bytes!.isNotEmpty) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'File',
+              file.bytes!,
+              filename: file.name
+            ),
+          );
+        } else if (!kIsWeb && file.path != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'File',
+              file.path!,
+              filename: file.name
+            ),
+          );
+        }
+      }
 
-    if (image != null && image.bytes != null) {
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'DisplayImage',
-          image.bytes!,
-          filename: image.name,
-        ),
-      );
-    }
+      if (image != null) {
+        if (kIsWeb && image.bytes != null && image.bytes!.isNotEmpty) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'DisplayImage',
+              image.bytes!,
+              filename: image.name
+            ),
+          );
+        } else if (!kIsWeb && image.path != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'DisplayImage',
+              image.path!,
+              filename: image.name
+            ),
+          );
+        }
+      }
 
-    final response = await request.send();
-    if (response.statusCode == 200) {
-      return true;
-    } else {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        await getAllInnovations();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }
-
   Future<void> approveInnovation(int id) async {
     final response = await _client.post(
       Uri.parse('$baseUrl/Innovation/approve/$id'),
       headers: _getHeaders(),
     );
 
-    if (response.statusCode != 204) {
-      throw Exception('Failed to approve innovation: ${response.body}');
+    if (response.statusCode == 204 || response.statusCode == 200) {
+      await getAllInnovations();
     }
   }
 
@@ -223,8 +247,8 @@ class BaseHelperService {
       headers: _getHeaders(),
     );
 
-    if (response.statusCode != 204) {
-      throw Exception('Failed to reject innovation: ${response.body}');
+    if (response.statusCode == 204 || response.statusCode == 200) {
+      await getAllInnovations();
     }
   }
 

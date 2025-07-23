@@ -1,5 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
@@ -37,36 +38,37 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
   );
   String? _fileName, _fileNameForDisplayImage;
   PlatformFile? _selectedFile, _selectedFileForDisplayImage;
-
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'png', 'doc', 'docx'],
+      type: FileType.any,
+      withData: kIsWeb,
+      withReadStream: !kIsWeb,
     );
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
         _selectedFile = result.files.first;
         _fileName = _selectedFile!.name;
-        innovation.file = _selectedFile!.path;
+        innovation.file = _selectedFile!.path ?? '';
       });
     }
   }
+
   Future<void> _pickDisplayImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'png', 'jpeg'],
+      type: FileType.any,
+      withData: kIsWeb,
+      withReadStream: !kIsWeb,
     );
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
         _selectedFileForDisplayImage = result.files.first;
         _fileNameForDisplayImage = _selectedFileForDisplayImage!.name;
-        innovation.displayImage = _selectedFileForDisplayImage!.path;
+        innovation.displayImage = _selectedFileForDisplayImage!.path ?? '';
       });
     }
   }
-
   Future<void> _save() async {
     if (innovation.title!.isEmpty || innovation.summary!.isEmpty) {
         Dialogs.flushBar(context, 'Error', 'Please fill in all fields');
@@ -80,6 +82,8 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
       return;
     }
     if(mounted){
+      // final provider = Provider.of<SciKFProvider>(context, listen: false);
+      // provider.createAndUpdateInnovation(innovation, _selectedFile, _selectedFileForDisplayImage);
       Navigator.pop(context);
       Navigator.pushNamed(context, addedForReviewMessageScreenRoute);
       Dialogs.flushBar(context, 'Success', 'Innovation submitted for review');
@@ -202,6 +206,11 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
                 ),
                 GestureDetector(
                   onTap:() async {
+                    if (_selectedFile == null || _selectedFileForDisplayImage == null) {
+                      Navigator.pop(context);
+                      Dialogs.flushBar(context, 'Error', 'Please upload both document and display image');
+                      return;
+                    }
                     innovation.authorId = user!.id;
                     await _save();
                   } ,

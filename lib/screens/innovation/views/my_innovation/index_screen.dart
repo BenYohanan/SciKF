@@ -12,6 +12,7 @@ import '../../../../services/BaseHelperService.dart';
 import '../../../../services/StorageService.dart';
 import '../../../../services/storage_keys.dart';
 import '../../../../widgets/dialogs.dart';
+import '../innovation_details_screen.dart';
 
 class MyInnovationScreen extends StatefulWidget {
   const MyInnovationScreen({super.key});
@@ -118,14 +119,24 @@ class _MyInnovationScreenState extends State<MyInnovationScreen> {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
-                        child: SecondaryFindingsCard(
-                          image: findings[index].image,
-                          category: findings[index].category,
-                          author: findings[index].author,
-                          title: findings[index].title,
-                          date: findings[index].date,
-                          status: findings[index].status,
-                          authorEmail: findings[index].authorEmail,
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => InnovationDetailsScreen(innovationModel: findings[index]),
+                              ),
+                            );
+                          },
+                          child: SecondaryFindingsCard(
+                            image: findings[index].image,
+                            category: findings[index].category,
+                            author: findings[index].author,
+                            title: findings[index].title,
+                            date: findings[index].date,
+                            status: findings[index].status,
+                            authorEmail: findings[index].authorEmail,
+                          ),
                         ),
                       ),
                       Divider(

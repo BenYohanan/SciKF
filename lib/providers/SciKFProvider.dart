@@ -78,6 +78,22 @@ class SciKFProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+  // Future<void> createAndUpdateInnovation(InnovationDTO innovation, PlatformFile? file, PlatformFile? image) async {
+  //   final newInnovation = InnovationModel(
+  //     image: image?.name ?? '', // Use server-provided URL if available
+  //     author: innovation.authorId ?? '',
+  //     title: innovation.title ?? '',
+  //     category: innovation.category?.displayName ?? '',
+  //     status: 'Pending', // Default status
+  //     date: DateTime.now().toString(), // Current date
+  //   );
+  //   recentInnovations.add(newInnovation);
+  //   await _storageService.saveToLocalStorage(
+  //     recentInnovationsKey,
+  //     jsonEncode(recentInnovations.map((e) => e.toJson()).toList()),
+  //   );
+  //   notifyListeners();
+  // }
   void clearState() {
     user = null;
     recentInnovations = [];

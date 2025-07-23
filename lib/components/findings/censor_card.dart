@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
 
 import '../../constants.dart';
+import '../../screens/innovation/views/innovation_details_screen.dart';
 import '../../size_config.dart';
 import '../network_image_with_loader.dart';
 
@@ -161,8 +163,8 @@ class _CensorCardState extends State<CensorCard> {
                         Dialogs.flushBar(context,"Success", "Innovation rejected Successfully");
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: primaryColor,
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
                       textStyle: TextStyle(
@@ -177,28 +179,35 @@ class _CensorCardState extends State<CensorCard> {
                   ),
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF418C47),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
-                      textStyle: TextStyle(
-                        fontSize: getProportionateScreenHeight(12),
-                        fontWeight: FontWeight.w500,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text("Request Edit"),
-                  ),
-                ),
-              ),
+              // Expanded(
+              //   child: Padding(
+              //     padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
+              //     child: ElevatedButton(
+              //       onPressed: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) => InnovationDetailsScreen(innovationModel: pendingInnovations[index]),
+              //           ),
+              //         );
+              //       },
+              //       style: ElevatedButton.styleFrom(
+              //         backgroundColor: Color(0xFF418C47),
+              //         foregroundColor: Colors.white,
+              //         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              //         minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
+              //         textStyle: TextStyle(
+              //           fontSize: getProportionateScreenHeight(12),
+              //           fontWeight: FontWeight.w500,
+              //         ),
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(8),
+              //         ),
+              //       ),
+              //       child: const Text("View"),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           Divider(

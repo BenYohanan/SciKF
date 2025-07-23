@@ -12,6 +12,7 @@ import '../../../services/BaseHelperService.dart';
 import '../../../services/StorageService.dart';
 import '../../../services/storage_keys.dart';
 import '../../../widgets/dialogs.dart';
+import 'innovation_details_screen.dart';
 
 class ApprovedInnovationsScreen extends StatefulWidget {
   const ApprovedInnovationsScreen({super.key});
@@ -120,14 +121,24 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
-                        child: SecondaryFindingsCard(
-                          image: approvedInnovations[index].image,
-                          category: approvedInnovations[index].category,
-                          author: approvedInnovations[index].author,
-                          title: approvedInnovations[index].title,
-                          date: approvedInnovations[index].date,
-                          status: approvedInnovations[index].status,
-                          authorEmail: approvedInnovations[index].authorEmail,
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => InnovationDetailsScreen(innovationModel: approvedInnovations[index]),
+                              ),
+                            );
+                          },
+                          child: SecondaryFindingsCard(
+                            image: approvedInnovations[index].image,
+                            category: approvedInnovations[index].category,
+                            author: approvedInnovations[index].author,
+                            title: approvedInnovations[index].title,
+                            date: approvedInnovations[index].date,
+                            status: approvedInnovations[index].status,
+                            authorEmail: approvedInnovations[index].authorEmail,
+                          ),
                         ),
                       ),
                       Divider(
