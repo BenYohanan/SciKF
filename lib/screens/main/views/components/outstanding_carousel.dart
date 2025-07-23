@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:news_feeds/model/innovation_model.dart';
 
 import '../../../../components/Banner/banner_m_style_2.dart';
 import '../../../../components/dot_indicators.dart';
 import '../../../../constants.dart';
 
 class OutstandingCarousel extends StatefulWidget {
-  const OutstandingCarousel({
+  OutstandingCarousel({
     super.key,
+    required this.flashInnovations,
   });
-
+  List<InnovationModel> flashInnovations = [];
   @override
   State<OutstandingCarousel> createState() => _OutstandingCarouselState();
 }
@@ -20,42 +22,11 @@ class _OutstandingCarouselState extends State<OutstandingCarousel> {
   late PageController _pageController;
   late Timer _timer;
 
-  List offers = [
-    BannerMStyle2(
-      title: "Explore the Universe with Free Astronomy Course",
-      subtitle: "Health",
-      image: "https://i.imgur.com/J1Qjut7.png",
-      press: () {
-      },
-    ),
-    BannerMStyle2(
-      title: "Breakthroughs in AI",
-      subtitle: "Agriculture",
-      image: "https://i.imgur.com/UP7xhPG.png",
-      press: () {
-      },
-    ),
-    BannerMStyle2(
-      title: "Test Your Knowledge take the Physics Quiz",
-      subtitle: "Environmental Science",
-      image: "https://i.imgur.com/UP7xhPG.png",
-      press: () {
-      },
-    ),
-    BannerMStyle2(
-      title: "Eco-Friendly Tech - discover Green Innovations",
-      subtitle: "Energy",
-      image: "https://i.imgur.com/UP7xhPG.png",
-      press: () {
-      },
-    ),
-  ];
-
   @override
   void initState() {
     _pageController = PageController(initialPage: 0);
     _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
-      if (_selectedIndex < offers.length - 1) {
+      if (_selectedIndex < widget.flashInnovations.length - 1) {
         _selectedIndex++;
       } else {
         _selectedIndex = 0;
@@ -86,13 +57,21 @@ class _OutstandingCarouselState extends State<OutstandingCarousel> {
         children: [
           PageView.builder(
             controller: _pageController,
-            itemCount: offers.length,
+            itemCount: widget.flashInnovations.length,
             onPageChanged: (int index) {
               setState(() {
                 _selectedIndex = index;
               });
             },
-            itemBuilder: (context, index) => offers[index],
+        itemBuilder: (context, index) {
+          final innovation = widget.flashInnovations[index];
+          return BannerMStyle2(
+            title: innovation.title.isNotEmpty ? innovation.title : '',
+            category: innovation.category.isNotEmpty ? innovation.category : '',
+            image: innovation.image,
+            press: (){},
+          );
+        },
           ),
           FittedBox(
             child: Padding(
@@ -101,7 +80,7 @@ class _OutstandingCarouselState extends State<OutstandingCarousel> {
                 height: 16,
                 child: Row(
                   children: List.generate(
-                    offers.length,
+                    widget.flashInnovations.length,
                     (index) {
                       return Padding(
                         padding:

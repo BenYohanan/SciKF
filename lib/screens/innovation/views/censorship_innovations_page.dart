@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
 import '../../../components/findings/censor_card.dart';
-import '../../../components/skleton/others/discover_categories_skelton.dart';
 import '../../../constants.dart';
 import '../../../model/innovation_model.dart';
 import '../../../services/BaseHelperService.dart';
@@ -39,7 +38,7 @@ class _CensorshipInnovationsScreenState extends State<CensorshipInnovationsScree
         }
       }
 
-      if (pendingInnovations.isEmpty && forceSync) {
+      if (pendingInnovations.isEmpty || forceSync) {
           pendingInnovations = await baseHelperService.getPendingInnovations();
       }
       if (mounted) {
@@ -64,6 +63,11 @@ class _CensorshipInnovationsScreenState extends State<CensorshipInnovationsScree
 
   Future<void> _refreshData() async {
     await _loadPendingInnovations(forceSync: true);
+  }
+  @override
+  void initState() {
+    super.initState();
+    _loadPendingInnovations();
   }
   @override
   Widget build(BuildContext context) {
@@ -91,31 +95,42 @@ class _CensorshipInnovationsScreenState extends State<CensorshipInnovationsScree
                     ),
                   ),
                 ),
-                Expanded(
-                  child: _isLoading
-                      ? const DiscoverCategoriesSkelton()
-                      : pendingInnovations.isEmpty
-                      ? const Center(child: Text("No innovations available"))
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: pendingInnovations.length,
-                    itemBuilder: (context, index) => Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
-                          child: CensorCard(
-                              image: pendingInnovations[index].image,
-                              category: pendingInnovations[index].category,
-                              title: pendingInnovations[index].title,
-                              author: "Marv",
-                              authorId: "12345",
-                              date: pendingInnovations[index].date,
-                              status: pendingInnovations[index].status
-                          ),
+                pendingInnovations.isEmpty
+                    ? ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: 1,
+                  itemBuilder: (context, index) => Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
+                        child: CensorCard(
+                          image: "",
+                          category: "",
+                          author: "",
+                          authorId: "",
+                          title: "No Innovations Available",
+                          status: "",
+                          id: 0,
                         ),
-                      ],
-                    ),
+                      )
+                    ],
+                  ),
+                )
+                    :
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pendingInnovations.length,
+                  itemBuilder: (context, index) => CensorCard(
+                      image: pendingInnovations[index].image,
+                      category: pendingInnovations[index].category,
+                      title: pendingInnovations[index].title,
+                      author: pendingInnovations[index].author,
+                      authorId: pendingInnovations[index].authorId ?? "",
+                      date: pendingInnovations[index].date,
+                      status: pendingInnovations[index].status,
+                      id: pendingInnovations[index].id!
                   ),
                 ),
               ],

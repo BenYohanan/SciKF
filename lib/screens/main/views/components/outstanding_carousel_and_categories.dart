@@ -12,17 +12,14 @@ class OutstandingCarouselAndCategories extends StatelessWidget {
   OutstandingCarouselAndCategories({
     super.key,
     required this.outstandingInnovation,
-    required this.isLoading
   });
   List<InnovationModel>? outstandingInnovation = [];
-  bool isLoading;
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        isLoading ? const OffersSkelton() :
-        const OutstandingCarousel(),
+        OutstandingCarousel(flashInnovations: outstandingInnovation!),
         SizedBox(height: getProportionateScreenHeight(8)),
         Padding(
           padding: EdgeInsets.all(getProportionateScreenHeight(16)),

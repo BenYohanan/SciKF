@@ -3,7 +3,7 @@ class ApplicationUser {
   final String? fullName;
   final String? email;
   final String? profilePicture;
-  final String? phoneNumber;
+  final String phoneNumber;
   final bool isAdmin;
 
   ApplicationUser({
@@ -11,7 +11,7 @@ class ApplicationUser {
     this.fullName,
     this.email,
     this.profilePicture,
-    this.phoneNumber,
+    this.phoneNumber = "",
     this.isAdmin = false,
   });
 
@@ -20,7 +20,9 @@ class ApplicationUser {
       id: json['id'],
       fullName: json['fullName'],
       email: json['email'],
-      profilePicture: json['profilePicture'],
+      profilePicture: json['profilePicture'] == null
+          ? ""
+          : json['profilePicture'].toString(),
       phoneNumber: json['phoneNumber'],
       isAdmin: json['isAdmin'] ?? false,
     );

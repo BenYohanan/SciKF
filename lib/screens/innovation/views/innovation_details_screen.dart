@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:news_feeds/model/innovation_model.dart';
+import 'package:news_feeds/size_config.dart';
 
-
-import '../../../components/innovation_action_button.dart';
+import '../../../components/network_image_with_loader.dart';
 import '../../../constants.dart';
-import 'components/product_images.dart';
 import 'components/innovation_info.dart';
 
 class InnovationDetailsScreen extends StatelessWidget {
-  const InnovationDetailsScreen({super.key, this.isAdmin = true});
-
-  final bool isAdmin;
-
+  InnovationDetailsScreen({
+    super.key,
+    required this.innovationModel,
+  });
+    final InnovationModel innovationModel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: isAdmin
-          ? InnovationActionButton(
-        onAccept: () {},
-        onReject: () {},
-      )
-          : null,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -35,14 +30,31 @@ class InnovationDetailsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const ProductImages(
-              images: [productDemoImg1, productDemoImg2, productDemoImg3],
+            SliverToBoxAdapter(
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(getProportionateScreenHeight(10)),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(defaultBorderRadious * 2),
+                        ),
+                        child: innovationModel.image.isEmpty
+                            ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)
+                            : NetworkImageWithLoader(innovationModel.image),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             InnovationInfo(
-              author: "Broad Institute",
-              title: "CRISPR-Cas9 Gene Editing Breakthrough",
-              description:
-              "CRISPR-Cas9 technology has revolutionized genetic engineering, enabling precise edits to DNA to treat diseases like sickle cell anemia. Developed by leading researchers, this tool is transforming medicine and biotechnology.",
+              author: innovationModel.author,
+              title: innovationModel.title,
+              description: innovationModel.summary!,
+              category:  innovationModel.category
             ),
           ],
         ),

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
-import '../../../providers/AuthProvider.dart';
+import '../../../providers/SciKFProvider.dart';
 import '../../../services/BaseHelperService.dart';
 import '../../../services/StorageService.dart';
 import 'components/outstanding_carousel_and_categories.dart';
@@ -17,30 +17,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  bool _isLoading = false;
   var storageService = StorageService();
   var baseHelperService = BaseHelperService();
 
   Future<void> _refreshMainScreenData({bool forceSync = false}) async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
       baseHelperService.reloadMainScreenData();
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
@@ -53,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<SciKFProvider>(context);
     final recentInnovations = authProvider.recentInnovations;
-    final outstandingInnovations = authProvider.outstandingInnovations;
+    final outstandingInnovations = authProvider.flashInnovations;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
@@ -66,14 +51,12 @@ class _MainScreenState extends State<MainScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: OutstandingCarouselAndCategories(
-                  outstandingInnovation: outstandingInnovations,
-                  isLoading: _isLoading,
+                  outstandingInnovation: outstandingInnovations
                 ),
               ),
               SliverToBoxAdapter(
                 child: RecentInnovations(
-                  recentInnovation: recentInnovations,
-                  isLoading: _isLoading,
+                  recentInnovations: recentInnovations
                 ),
               ),
             ],

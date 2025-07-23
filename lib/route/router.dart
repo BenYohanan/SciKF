@@ -53,13 +53,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case profileScreenRoute:
       return MaterialPageRoute(builder: (context) => const ProfileScreen());
-    case productDetailsScreenRoute:
-      return MaterialPageRoute(
-        builder: (context) {
-          bool isProductAvailable = settings.arguments as bool? ?? true;
-          return InnovationDetailsScreen(isAdmin: isProductAvailable);
-        },
-      );
     case censorshipInnovationsPageRoute:
       return MaterialPageRoute(
         builder: (context) => CensorshipInnovationsScreen(),

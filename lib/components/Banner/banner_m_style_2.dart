@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:news_feeds/size_config.dart';
 
 import '../../constants.dart';
 import 'banner_m.dart';
@@ -7,14 +8,13 @@ import 'banner_m.dart';
 class BannerMStyle2 extends StatelessWidget {
   const BannerMStyle2({
     super.key,
-    this.image = "https://i.imgur.com/J1Qjut7.png",
+    this.image,
     required this.title,
     required this.press,
-    this.subtitle,
+    this.category,
   });
-  final String? image;
+  final String? image,category;
   final String title;
-  final String? subtitle;
   final VoidCallback press;
 
   @override
@@ -35,22 +35,22 @@ class BannerMStyle2 extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: grandisExtendedFont,
-                        fontSize: 28,
+                        fontSize: getProportionateScreenHeight(28),
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                         height: 1,
                       ),
                     ),
                     const SizedBox(height: defaultPadding / 4),
-                    if (subtitle != null)
+                    if (category != null)
                       Text(
-                        subtitle!.toUpperCase(),
-                        style: const TextStyle(
+                        category!.toUpperCase(),
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: getProportionateScreenHeight(12),
                         ),
                       ),
                   ],

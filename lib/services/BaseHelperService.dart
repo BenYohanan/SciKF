@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_feeds/services/storage_keys.dart';
+import 'package:provider/provider.dart';
 
+import '../constants.dart';
 import '../model/auth_models.dart';
 import '../model/innovationDTO.dart';
 import '../model/innovation_model.dart';
 import '../model/user.dart';
+import '../providers/SciKFProvider.dart';
 import 'StorageService.dart';
 
 class BaseHelperService {
-  static const String baseUrl = "https://192.168.1.229/api";
   final http.Client _client = http.Client();
   final StorageService _storageService = StorageService();
 
@@ -36,7 +39,7 @@ class BaseHelperService {
     }
   }
 
-  Future<String> login(LoginModel model) async {
+  Future<String> login(LoginModel model, BuildContext context) async {
     final response = await _client.post(
       Uri.parse('$baseUrl/Account/login'),
       headers: _getHeaders(),
@@ -45,15 +48,30 @@ class BaseHelperService {
 
     if (response.statusCode == 200) {
       final apiResponse = jsonDecode(response.body);
-      var data = apiResponse;
-      var user = ApplicationUser.fromJson(data.user);
-      await _storageService.saveToLocalStorage(loginUserKey, jsonEncode(user));
-      await _storageService.saveToLocalStorage(loginUserIdKey, user.id!);
-      await _storageService.saveToLocalStorage(isAdminKey, user.isAdmin.toString());
-      var recentInnovations = InnovationModel.fromJson(data.recentInnovations);
-      await _storageService.saveToLocalStorage(recentInnovationsKey, jsonEncode(recentInnovations));
-      var flashInnovations = InnovationModel.fromJson(data.flashInnovations);
-      await _storageService.saveToLocalStorage(flashInnovationsKey, jsonEncode(flashInnovations));
+      var user = ApplicationUser.fromJson(apiResponse['user']);
+      var recentInnovations = (apiResponse['recentInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      await _storageService.saveToLocalStorage(
+          recentInnovationsKey, jsonEncode(recentInnovations.map((e) => e.toJson()).toList()));
+      var flashInnovations = (apiResponse['flashInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      var myInnovations = (apiResponse['myInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      var approvedInnovations = (apiResponse['approvedInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      final provider = Provider.of<SciKFProvider>(context, listen: false);
+      await provider.updateAfterLogin(
+        user: user,
+        recentInnovations: recentInnovations,
+        flashInnovations: flashInnovations,
+        myInnovations: myInnovations,
+        approvedInnovations: approvedInnovations,
+      );
+
       return "Successfully logged in";
     } else {
       var message = jsonDecode(response.body);

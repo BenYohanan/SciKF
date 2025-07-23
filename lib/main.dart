@@ -1,7 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:news_feeds/providers/AuthProvider.dart';
+import 'package:news_feeds/providers/SciKFProvider.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/route/router.dart' as router;
 import 'package:news_feeds/services/DatabaseHelper.dart';
@@ -17,12 +16,14 @@ void main() async {
   await storageService.init();
   final dbHelper = DatabaseHelper();
   await dbHelper.database;
-  runApp(MyApp(dbHelper: dbHelper));
+  runApp(MyApp(dbHelper: dbHelper, storageService: storageService));
 }
 
 class MyApp extends StatelessWidget {
   final DatabaseHelper dbHelper;
-  const MyApp({super.key, required this.dbHelper});
+  final StorageService storageService;
+
+  const MyApp({super.key, required this.dbHelper, required this.storageService});
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +32,11 @@ class MyApp extends StatelessWidget {
         SizeConfig().init(context);
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => SciKFProvider()..loadUserData()),
-            ChangeNotifierProvider(create: (_) => SciKFProvider()..loadMainPageData()),
+            ChangeNotifierProvider(
+              create: (_) => SciKFProvider(storageService)
+                ..loadUserData()
+                ..loadMainPageData(),
+            ),
           ],
           child: MaterialApp(
             title: 'News Feeds',
@@ -47,10 +51,11 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true; // For testing only
   }
 }

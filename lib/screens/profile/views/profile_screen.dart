@@ -5,7 +5,7 @@ import 'package:news_feeds/services/StorageService.dart';
 import 'package:news_feeds/size_config.dart';
 import 'package:provider/provider.dart';
 import '../../../constants.dart';
-import '../../../providers/AuthProvider.dart';
+import '../../../providers/SciKFProvider.dart';
 import '../../../route/route_constants.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
@@ -32,9 +32,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: ListView(
         children: [
           ProfileCard(
-            name: user!.fullName ?? "",
-            email: user.email ?? "",
-            imageSrc: user.profilePicture ?? "",
+            name: user != null ? user.fullName! : "",
+            email: user != null ? user.email! : "",
+            imageSrc: user != null ? (user.profilePicture == null ? "" : user.profilePicture!) : "",
             press: () {
               Navigator.pushNamed(context, userInfoScreenRoute);
             },
@@ -61,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pushNamed(context, postAnInnovationScreenRoute);
             },
           ),
-          if(user.isAdmin)...[
+          if(user != null && user.isAdmin)...[
             ProfileMenuListTile(
               text: "Censorship Innovations",
               svgSrc: "assets/icons/Censorship.svg",
@@ -98,6 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             press: () {
               StorageService().clearSecureStorage();
               StorageService().wipeStorage();
+              Provider.of<SciKFProvider>(context, listen: false).clearState();
               Navigator.pushNamed(context, logInScreenRoute);
             },
           ),

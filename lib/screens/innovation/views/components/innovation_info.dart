@@ -8,10 +8,11 @@ class InnovationInfo extends StatelessWidget {
     super.key,
     required this.title,
     required this.author,
-    required this.description
+    required this.description,
+    required this.category
   });
 
-  final String title, author, description;
+  final String title, author, description, category;
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +23,37 @@ class InnovationInfo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              author.toUpperCase(),
-              style: TextStyle(fontWeight: FontWeight.bold, color: primaryColor),
-            ),
-            const SizedBox(height: defaultPadding / 2),
-            Text(
               title,
               maxLines: 2,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(20),
+                fontWeight: FontWeight.bold,
+                color: kTextColor,
+              ),
             ),
-            SizedBox(height: getProportionateScreenHeight(10)),
+            SizedBox(height: getProportionateScreenHeight(2)),
             Text(
-              "Innovation info",
+              "Category: $category",
               style: TextStyle(
                 fontSize: getProportionateScreenHeight(16),
                 fontWeight: FontWeight.bold,
-                color: primaryColor,
+                color: kTextColor,
               ),
             ),
-            const SizedBox(height: defaultPadding / 2),
+            SizedBox(height: getProportionateScreenHeight(2)),
+            Text(
+              "Author: ${author.toUpperCase()}",
+              style: TextStyle(fontWeight: FontWeight.bold, color: primaryColor),
+            ),
+            SizedBox(height: getProportionateScreenHeight(16)),
             Text(
               description,
-              style: const TextStyle(height: 1.4),
+                style: TextStyle(
+                  fontSize: getProportionateScreenHeight(16),
+                  fontWeight: FontWeight.bold,
+                  color: kTextColor,
+                ),
             ),
-            const SizedBox(height: defaultPadding / 2),
           ],
         ),
       ),

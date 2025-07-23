@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/services/BaseHelperService.dart';
+import 'package:news_feeds/widgets/dialogs.dart';
 
 import '../../constants.dart';
 import '../../size_config.dart';
 import '../network_image_with_loader.dart';
 
-class CensorCard extends StatelessWidget {
+class CensorCard extends StatefulWidget {
   const CensorCard({
     super.key,
     required this.image,
@@ -12,13 +14,21 @@ class CensorCard extends StatelessWidget {
     required this.title,
     required this.author,
     required this.authorId,
+    required this.id,
     this.date,
     this.status,
   });
 
   final String image, category, title, author, authorId;
   final String? date, status;
+  final int id;
 
+  @override
+  State<CensorCard> createState() => _CensorCardState();
+}
+
+class _CensorCardState extends State<CensorCard> {
+  BaseHelperService baseHelperService = BaseHelperService();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,10 +45,13 @@ class CensorCard extends StatelessWidget {
                   aspectRatio: 1.15,
                   child: Stack(
                     children: [
-                      NetworkImageWithLoader(
-                        image,
+                      widget.image.isEmpty
+                          ? Image.asset('assets/img/NoImg.png',fit: BoxFit.cover,
+                      )
+                          : NetworkImageWithLoader(
+                        widget.image,
                         radius: defaultBorderRadious,
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -53,27 +66,28 @@ class CensorCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        category.toUpperCase(),
+                        widget.title.toUpperCase(),
                         style: TextStyle(
                           fontSize: getProportionateScreenHeight(10),
                           fontWeight: FontWeight.w500,
-                          color: kTextColor,
+                          color:primaryColor,
                         ),
                       ),
                       SizedBox(height: getProportionateScreenHeight(5)),
                       Text(
-                        title,
+                        widget.category ?? "",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: getProportionateScreenHeight(12),
                           fontWeight: FontWeight.w500,
-                          color: primaryColor,
+                          color:kTextColor,
                         ),
                       ),
                       SizedBox(height: getProportionateScreenHeight(5)),
                       Text(
-                        "Author: $author",
+                        widget.author.isEmpty ? "":
+                        "Author: ${widget.author}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall!.copyWith(fontSize: 12),
@@ -82,7 +96,7 @@ class CensorCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            status ?? 'N/A',
+                            widget.status ?? '',
                             style: TextStyle(
                               color: primaryColor,
                               fontWeight: FontWeight.w500,
@@ -91,7 +105,7 @@ class CensorCard extends StatelessWidget {
                           ),
                           const SizedBox(width: defaultPadding / 4),
                           Text(
-                            date ?? 'N/A',
+                            widget.date ?? '',
                             style: TextStyle(
                               color: Theme.of(context).textTheme.bodyMedium!.color,
                               fontSize: 10,
@@ -113,7 +127,12 @@ class CensorCard extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Dialogs.loader(context);
+                      baseHelperService.approveInnovation(widget.id);
+                        Navigator.pop(context);
+                        Dialogs.flushBar(context,"Success", "Innovation Approved Successfully");
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
@@ -135,7 +154,12 @@ class CensorCard extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Dialogs.loader(context);
+                      baseHelperService.rejectInnovation(widget.id);
+                        Navigator.pop(context);
+                        Dialogs.flushBar(context,"Success", "Innovation rejected Successfully");
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: primaryColor,

@@ -156,18 +156,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: primaryColor,
           ),
         ),
-        Builder(
-          builder: (context) => IconButton(
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-            icon: SvgPicture.asset(
-              "assets/icons/Login.svg",
-              height: 24,
-              color: primaryColor,
-            ),
-          ),
-        ),
+        // Builder(
+        //   builder: (context) => IconButton(
+        //     onPressed: () {
+        //       Scaffold.of(context).openDrawer();
+        //     },
+        //     icon: SvgPicture.asset(
+        //       "assets/icons/Login.svg",
+        //       height: 24,
+        //       color: primaryColor,
+        //     ),
+        //   ),
+        // ),
         SizedBox(width: getProportionateScreenHeight(20)),
       ],
     );

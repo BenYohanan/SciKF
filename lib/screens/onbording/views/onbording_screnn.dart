@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../components/dot_indicators.dart';
 import '../../../constants.dart';
-import '../../../providers/AuthProvider.dart';
+import '../../../providers/SciKFProvider.dart';
 import '../../../route/route_constants.dart';
 import 'components/onbording_content.dart';
 

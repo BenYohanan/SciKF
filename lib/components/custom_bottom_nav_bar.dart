@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../constants.dart';
-import '../providers/AuthProvider.dart';
+import '../providers/SciKFProvider.dart';
 import '../route/route_constants.dart';
 
 class CustomBottomNavBar extends StatefulWidget {
@@ -88,7 +88,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware
             activeIcon: svgIcon("assets/icons/Bookmark.svg", color: primaryColor),
             label: "Innovations",
           ),
-        if (user!.id!.isNotEmpty)
+        if (user != null && user.id!.isNotEmpty)
             BottomNavigationBarItem(
               icon: svgIcon("assets/icons/Profile.svg"),
               activeIcon: svgIcon("assets/icons/Profile.svg", color: primaryColor),

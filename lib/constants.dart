@@ -7,7 +7,8 @@ const kTextColor = Colors.black87;
 const kAnimationDuration = Duration(milliseconds: 200);
 const primaryColor = Color(0xFF2E7D32);
 const defaultDuration = Duration(milliseconds: 250);
-
+const String baseUrl = "https://192.168.1.229/api";
+const String imgBaseUrl = "https://192.168.1.229";
 // Form Error
 final RegExp emailValidatorRegExp =
 RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");

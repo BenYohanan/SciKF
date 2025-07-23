@@ -127,7 +127,7 @@ class _LogInFormState extends State<LogInForm> {
                     userName: _usernameController.text,
                     password: _passwordController.text,
                   );
-                  var loginMessage = await _service.login(model);
+                  var loginMessage = await _service.login(model, context);
                   if (loginMessage == "Successfully logged in") {
                     await storageService.saveSecureData("userEmail", _usernameController.text);
                     await storageService.saveSecureData("userPassword", _passwordController.text);

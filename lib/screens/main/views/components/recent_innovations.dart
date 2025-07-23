@@ -6,15 +6,14 @@ import '../../../../components/skleton/innovation/products_skelton.dart';
 import '../../../../constants.dart';
 import '../../../../model/innovation_model.dart';
 import '../../../../route/route_constants.dart';
+import '../../../innovation/views/innovation_details_screen.dart';
 
 class RecentInnovations extends StatelessWidget {
   RecentInnovations({
     super.key,
-    required this.recentInnovation,
-    required this.isLoading
+    required this.recentInnovations,
   });
-  List<InnovationModel>? recentInnovation = [];
-  bool isLoading;
+  List<InnovationModel> recentInnovations = [];
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -32,7 +31,6 @@ class RecentInnovations extends StatelessWidget {
             ),
           ),
         ),
-        isLoading ? const ProductsSkelton() :
         SizedBox(
           height: getProportionateScreenHeight(270),
           child: ListView.builder(
@@ -51,8 +49,12 @@ class RecentInnovations extends StatelessWidget {
                 title: recentInnovations[index].title,
                 category: recentInnovations[index].category,
                 press: () {
-                  Navigator.pushNamed(context, productDetailsScreenRoute,
-                      arguments: index.isEven);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InnovationDetailsScreen(innovationModel: recentInnovations[index]),
+                    ),
+                  );
                 },
               ),
             ),

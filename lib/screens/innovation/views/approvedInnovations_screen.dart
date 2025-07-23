@@ -8,7 +8,6 @@ import '../../../../components/custom_app_bar.dart';
 import '../../../../components/custom_bottom_nav_bar.dart';
 import '../../../../components/findings/secondary_product_card.dart';
 import '../../../../model/innovation_model.dart';
-import '../../../components/skleton/others/discover_categories_skelton.dart';
 import '../../../services/BaseHelperService.dart';
 import '../../../services/StorageService.dart';
 import '../../../services/storage_keys.dart';
@@ -25,12 +24,8 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
   List<InnovationModel> approvedInnovations = [];
   var storageService = StorageService();
   var baseHelperService = BaseHelperService();
-  bool _isLoading = false;
 
   Future<void> _loadApprovedInnovations({bool forceSync = false}) async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
       if (!forceSync) {
         final String? cachedInnovationsJson = await storageService.getFromLocalStorage(approvedInnovationsKey);
@@ -40,12 +35,11 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
         }
       }
 
-      if (approvedInnovations.isEmpty && forceSync) {
-        approvedInnovations = await baseHelperService.getPendingInnovations();
+      if (approvedInnovations.isEmpty || forceSync) {
+        approvedInnovations = await baseHelperService.getAllInnovations();
       }
       if (mounted) {
         setState(() {
-          _isLoading = false;
           approvedInnovations = approvedInnovations;
         });
       }
@@ -55,16 +49,15 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
         await Dialogs.flushBar(context, "Error", "Failed to load innovations");
       }
     }
-    finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
   Future<void> _refreshData() async {
     await _loadApprovedInnovations(forceSync: true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadApprovedInnovations();
   }
   @override
   Widget build(BuildContext context) {
@@ -74,6 +67,7 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
         child: CustomAppBar(),
       ),
       body: RefreshIndicator(
+        color: primaryColor,
         onRefresh: _refreshData,
         child: SafeArea(
           child: Padding(
@@ -90,35 +84,58 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                ),
-                Expanded(
-                  child: _isLoading
-                      ? const DiscoverCategoriesSkelton()
-                      : approvedInnovations.isEmpty
-                      ? const Center(child: Text("No innovations available"))
-                      : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: approvedInnovations.length,
-                    itemBuilder: (context, index) => Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
-                          child: SecondaryFindingsCard(
-                            image: approvedInnovations[index].image,
-                            category: approvedInnovations[index].category,
-                            title: approvedInnovations[index].title,
-                            date: approvedInnovations[index].date,
-                            status: approvedInnovations[index].status
-                          ),
+                ), approvedInnovations.isEmpty
+                    ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 1,
+                        itemBuilder: (context, index) => Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
+                              child: SecondaryFindingsCard(
+                                image: "",
+                                category: "",
+                                author: "No Innovations Available",
+                                title: "",
+                                date: "",
+                                status: "",
+                                authorEmail: "",
+                              ),
+                            ),
+                            Divider(
+                              color: primaryColor,
+                              thickness: 1,
+                              height: getProportionateScreenHeight(16),
+                            ),
+                          ],
                         ),
-                        Divider(
-                          color: primaryColor,
-                          thickness: 1,
-                          height: getProportionateScreenHeight(16),
+                      )
+                    :
+                    ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: approvedInnovations.length,
+                  itemBuilder: (context, index) => Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
+                        child: SecondaryFindingsCard(
+                          image: approvedInnovations[index].image,
+                          category: approvedInnovations[index].category,
+                          author: approvedInnovations[index].author,
+                          title: approvedInnovations[index].title,
+                          date: approvedInnovations[index].date,
+                          status: approvedInnovations[index].status,
+                          authorEmail: approvedInnovations[index].authorEmail,
                         ),
-                      ],
-                    ),
+                      ),
+                      Divider(
+                        color: primaryColor,
+                        thickness: 1,
+                        height: getProportionateScreenHeight(16),
+                      ),
+                    ],
                   ),
                 ),
               ],

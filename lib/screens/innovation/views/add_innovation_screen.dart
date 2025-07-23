@@ -8,7 +8,7 @@ import 'package:news_feeds/widgets/dialogs.dart';
 import 'package:news_feeds/widgets/widget_helper.dart';
 import 'package:provider/provider.dart';
 import '../../../model/innovationDTO.dart';
-import '../../../providers/AuthProvider.dart';
+import '../../../providers/SciKFProvider.dart';
 import '../../../route/route_constants.dart';
 import '../../../services/DatabaseHelper.dart';
 import '../../../components/custom_app_bar.dart';
