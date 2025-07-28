@@ -37,7 +37,7 @@ class BannerMStyle2 extends StatelessWidget {
                       title,
                       style: TextStyle(
                         fontFamily: grandisExtendedFont,
-                        fontSize: getProportionateScreenHeight(28),
+                        fontSize: getProportionateScreenHeight(20),
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                         height: 1,

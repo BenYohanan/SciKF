@@ -41,6 +41,8 @@ class _CensorshipInnovationsScreenState extends State<CensorshipInnovationsScree
 
       if (pendingInnovations.isEmpty || forceSync) {
           pendingInnovations = await baseHelperService.getPendingInnovations();
+          var userId = await storageService.getFromLocalStorage(loginUserIdKey);
+          await baseHelperService.ReloadData(context, userId!);
       }
       if (mounted) {
         setState(() {

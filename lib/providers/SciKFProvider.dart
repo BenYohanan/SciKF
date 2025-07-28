@@ -48,7 +48,31 @@ class SciKFProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+  Future<void> reload({
+    required List<InnovationModel> recentInnovations,
+    required List<InnovationModel> flashInnovations,
+    required List<InnovationModel> approvedInnovations,
+    required List<InnovationModel> myInnovations,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+    this.recentInnovations = recentInnovations;
+    this.flashInnovations = flashInnovations;
+    this.approvedInnovations = approvedInnovations;
+    this.myInnovations = myInnovations;
 
+    await _storageService.saveToLocalStorage(
+        recentInnovationsKey, jsonEncode(recentInnovations.map((e) => e.toJson()).toList()));
+    await _storageService.saveToLocalStorage(
+        flashInnovationsKey, jsonEncode(flashInnovations.map((e) => e.toJson()).toList()));
+    await _storageService.saveToLocalStorage(
+        approvedInnovationsKey, jsonEncode(approvedInnovations.map((e) => e.toJson()).toList()));
+    await _storageService.saveToLocalStorage(
+        myInnovationsKey, jsonEncode(myInnovations.map((e) => e.toJson()).toList()));
+
+    isLoading = false;
+    notifyListeners();
+  }
   Future<void> loadUserData() async {
     isLoading = true;
     notifyListeners();

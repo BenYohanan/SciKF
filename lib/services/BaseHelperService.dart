@@ -80,6 +80,39 @@ class BaseHelperService {
     }
   }
 
+  Future<void>ReloadData(BuildContext context, String userId) async {
+    final response = await _client.get(
+      Uri.parse('$baseUrl/Innovation/reload/$userId'),
+      headers: _getHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      final apiResponse = jsonDecode(response.body);
+      var recentInnovations = (apiResponse['recentInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      await _storageService.saveToLocalStorage(
+          recentInnovationsKey,
+          jsonEncode(recentInnovations.map((e) => e.toJson()).toList()));
+      var flashInnovations = (apiResponse['flashInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      var myInnovations = (apiResponse['myInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      var approvedInnovations = (apiResponse['approvedInnovations'] as List)
+          .map((item) => InnovationModel.fromJson(item))
+          .toList();
+      final provider = Provider.of<SciKFProvider>(context, listen: false);
+      await provider.reload(
+        recentInnovations: recentInnovations,
+        flashInnovations: flashInnovations,
+        myInnovations: myInnovations,
+        approvedInnovations: approvedInnovations,
+      );
+    }
+  }
+
   Future<void> reloadMainScreenData() async {
     final response = await _client.get(
       Uri.parse('$baseUrl/Innovation/reload'),
@@ -171,6 +204,7 @@ class BaseHelperService {
       throw Exception('Failed to fetch innovation: ${response.body}');
     }
   }
+
   Future<bool> createInnovation(InnovationDTO innovation, PlatformFile? file, PlatformFile? image) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/Innovation/SaveInnovation'));
@@ -230,6 +264,7 @@ class BaseHelperService {
       return false;
     }
   }
+
   Future<void> approveInnovation(int id) async {
     final response = await _client.post(
       Uri.parse('$baseUrl/Innovation/approve/$id'),
@@ -237,7 +272,7 @@ class BaseHelperService {
     );
 
     if (response.statusCode == 204 || response.statusCode == 200) {
-      await getAllInnovations();
+
     }
   }
 

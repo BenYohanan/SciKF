@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/constants.dart';
+import 'package:news_feeds/services/storage_keys.dart';
 import 'package:provider/provider.dart';
 
 import '../../../components/custom_app_bar.dart';
@@ -22,7 +24,8 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _refreshMainScreenData({bool forceSync = false}) async {
     try {
-      baseHelperService.reloadMainScreenData();
+      var userId = await storageService.getFromLocalStorage(loginUserIdKey);
+      await baseHelperService.ReloadData(context, userId!);
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
@@ -45,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
         child: CustomAppBar(),
       ),
       body: RefreshIndicator(
+        color: primaryColor,
         onRefresh: _refreshData,
         child: SafeArea(
           child: CustomScrollView(

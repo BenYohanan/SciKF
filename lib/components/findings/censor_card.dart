@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
+import 'package:news_feeds/services/storage_keys.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
 
 import '../../constants.dart';
 import '../../screens/innovation/views/innovation_details_screen.dart';
+import '../../services/StorageService.dart';
 import '../../size_config.dart';
 import '../network_image_with_loader.dart';
 
@@ -129,10 +131,12 @@ class _CensorCardState extends State<CensorCard> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Dialogs.loader(context);
-                      baseHelperService.approveInnovation(widget.id);
-                        Navigator.pop(context);
+                      var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+                      await baseHelperService.approveInnovation(widget.id);
+                      await baseHelperService.ReloadData(context, myId!);
+                       Navigator.pop(context);
                         Dialogs.flushBar(context,"Success", "Innovation Approved Successfully");
                     },
                     style: ElevatedButton.styleFrom(
@@ -156,9 +160,11 @@ class _CensorCardState extends State<CensorCard> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: ()async {
                       Dialogs.loader(context);
-                      baseHelperService.rejectInnovation(widget.id);
+                      var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+                      await baseHelperService.rejectInnovation(widget.id);
+                      await baseHelperService.ReloadData(context, myId!);
                         Navigator.pop(context);
                         Dialogs.flushBar(context,"Success", "Innovation rejected Successfully");
                     },

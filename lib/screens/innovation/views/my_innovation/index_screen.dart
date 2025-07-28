@@ -39,6 +39,7 @@ class _MyInnovationScreenState extends State<MyInnovationScreen> {
       if (findings.isEmpty || forceSync) {
         var userId = await storageService.getFromLocalStorage(loginUserIdKey);
         findings = await baseHelperService.getLoggedInUserInnovations(userId!);
+        await baseHelperService.ReloadData(context, userId);
       }
       if (mounted) {
         setState(() {

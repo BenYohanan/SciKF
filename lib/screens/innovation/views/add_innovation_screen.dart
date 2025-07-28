@@ -82,8 +82,7 @@ class _PostInnovationScreenState extends State<PostInnovationScreen> {
       return;
     }
     if(mounted){
-      // final provider = Provider.of<SciKFProvider>(context, listen: false);
-      // provider.createAndUpdateInnovation(innovation, _selectedFile, _selectedFileForDisplayImage);
+      await baseHelperService.ReloadData(context, innovation.authorId!);
       Navigator.pop(context);
       Navigator.pushNamed(context, addedForReviewMessageScreenRoute);
       Dialogs.flushBar(context, 'Success', 'Innovation submitted for review');

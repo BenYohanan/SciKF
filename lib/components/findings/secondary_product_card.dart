@@ -13,7 +13,7 @@ class SecondaryFindingsCard extends StatelessWidget {
     required this.author,
     this.date,
     this.status,
-    this.authorEmail
+    this.authorEmail,
   });
 
   final String image, category, title, author;
@@ -22,22 +22,28 @@ class SecondaryFindingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(maxHeight: getProportionateScreenHeight(90)),
       padding: EdgeInsets.zero,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 1.15,
-            child: Stack(
-              children: [
-                image.isEmpty
-                    ? Image.asset('assets/img/NoImg.png',fit: BoxFit.cover,
-                )
-                    : NetworkImageWithLoader(
-                  image,
-                  radius: defaultBorderRadious,
-                )
-              ],
+          // Constrain the AspectRatio with a SizedBox
+          SizedBox(
+            width: getProportionateScreenWidth(120), // Define a fixed width
+            child: AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                children: [
+                  image.isEmpty
+                      ? Image.asset(
+                    'assets/img/NoImg.png',
+                    fit: BoxFit.cover,
+                  )
+                      : NetworkImageWithLoader(
+                    image,
+                    radius: defaultBorderRadious,
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(width: getProportionateScreenHeight(8)),
@@ -54,11 +60,12 @@ class SecondaryFindingsCard extends StatelessWidget {
                       fontSize: getProportionateScreenHeight(12),
                       fontWeight: FontWeight.w600,
                     ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: getProportionateScreenHeight(2)),
                   Text(
-                    category.isEmpty ? "":
-                    "Category: $category",
+                    category.isEmpty ? "" : "Category: $category",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context)
@@ -68,8 +75,7 @@ class SecondaryFindingsCard extends StatelessWidget {
                   ),
                   SizedBox(height: getProportionateScreenHeight(2)),
                   Text(
-                    author.isEmpty ? "":
-                    "Author: $author",
+                    author.isEmpty ? "" : "Author: $author",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context)
@@ -79,8 +85,7 @@ class SecondaryFindingsCard extends StatelessWidget {
                   ),
                   SizedBox(height: getProportionateScreenHeight(2)),
                   Text(
-                    authorEmail == null ? "":
-                    "Author Email: $authorEmail",
+                    authorEmail == null ? "" : "Author Email: $authorEmail",
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

@@ -7,9 +7,9 @@ const kTextColor = Colors.black87;
 const kAnimationDuration = Duration(milliseconds: 200);
 const primaryColor = Color(0xFF2E7D32);
 const defaultDuration = Duration(milliseconds: 250);
-const String baseUrl = "https://192.168.1.229/api";
-const String imgBaseUrl = "https://192.168.1.229";
-// Form Error
+const String baseUrl = "https://scikf.bivisoft.com/api";
+const String imgBaseUrl = "https://scikf.bivisoft.com";
+
 final RegExp emailValidatorRegExp =
 RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 const String kEmailNullError = "Please Enter your email";
@@ -36,19 +36,7 @@ OutlineInputBorder outlineInputBorder() {
   );
 }
 
-// Just for demo
-const productDemoImg1 = "https://i.imgur.com/CGCyp1d.png";
-const productDemoImg2 = "https://i.imgur.com/AkzWQuJ.png";
-const productDemoImg3 = "https://i.imgur.com/J7mGZ12.png";
-const productDemoImg4 = "https://i.imgur.com/q9oF9Yq.png";
-const productDemoImg5 = "https://i.imgur.com/MsppAcx.png";
-const productDemoImg6 = "https://i.imgur.com/JfyZlnO.png";
-
-// End For demo
-
 const grandisExtendedFont = "Grandis Extended";
-
-
 const MaterialColor primaryMaterialColor =
 MaterialColor(0xFF9581FF, <int, Color>{
   50: Color(0xFFEFECFF),

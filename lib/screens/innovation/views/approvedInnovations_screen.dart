@@ -38,6 +38,8 @@ class _ApprovedInnovationsScreenState extends State<ApprovedInnovationsScreen> {
 
       if (approvedInnovations.isEmpty || forceSync) {
         approvedInnovations = await baseHelperService.getAllInnovations();
+        var userId = await storageService.getFromLocalStorage(loginUserIdKey);
+        await baseHelperService.ReloadData(context, userId!);
       }
       if (mounted) {
         setState(() {
