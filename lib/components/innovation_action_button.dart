@@ -19,7 +19,7 @@ class InnovationActionButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: defaultPadding,
-          vertical: defaultBorderRadious / 2,
+          vertical: defaultBorderRadius / 2,
         ),
         child: SizedBox(
           height: 64,
@@ -31,7 +31,7 @@ class InnovationActionButton extends StatelessWidget {
                   clipBehavior: Clip.hardEdge,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(defaultBorderRadious),
+                      Radius.circular(defaultBorderRadius),
                     ),
                   ),
                   child: InkWell(
@@ -57,7 +57,7 @@ class InnovationActionButton extends StatelessWidget {
                   clipBehavior: Clip.hardEdge,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(defaultBorderRadious),
+                      Radius.circular(defaultBorderRadius),
                     ),
                   ),
                   child: InkWell(

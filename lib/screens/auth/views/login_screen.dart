@@ -23,10 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: EdgeInsets.all(getProportionateScreenHeight(20)),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Welcome back!",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(30),
                     fontWeight: FontWeight.bold,
@@ -36,6 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: getProportionateScreenHeight(15)),
                 Text(
                   "Log in to access your dashboard and manage your projects.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: getProportionateScreenHeight(14),
+                  ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 LogInForm(formKey: _formKey),

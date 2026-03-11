@@ -5,7 +5,7 @@ import '../model/news_item.dart';
 import 'DatabaseHelper.dart';
 
 class PromptService {
-  static const String apiKey = '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';
+  static const String apiKey = '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';
   static const String endpoint = 'https://api.openai.com/v1/chat/completions';
   final DatabaseHelper dbHelper;
 

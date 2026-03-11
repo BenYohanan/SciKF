@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../components/loader.dart';
 import '../../../../constants.dart';
 import '../../../../model/auth_models.dart';
 import '../../../../route/route_constants.dart';
@@ -145,7 +146,7 @@ class _SignUpFormState extends State<SignUpForm> {
               if (widget.formKey.currentState!.validate()) {
                 bool isDialogShown = false;
                 if (mounted) {
-                  Dialogs.loader(context);
+                  AppLoader.show(context);
                   isDialogShown = true;
                 }
                 try {

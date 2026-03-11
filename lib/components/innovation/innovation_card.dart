@@ -28,7 +28,7 @@ class InnovationCard extends StatelessWidget {
         height: getProportionateScreenHeight(300),
         decoration: BoxDecoration(
           border: Border.all(color: primaryColor, width: 1),
-          borderRadius: BorderRadius.circular(defaultBorderRadious),
+          borderRadius: BorderRadius.circular(defaultBorderRadius),
         ),
         clipBehavior: Clip.hardEdge,
         child: Column(
@@ -41,7 +41,7 @@ class InnovationCard extends StatelessWidget {
                   ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)
                   : NetworkImageWithLoader(
                       image,
-                      radius: defaultBorderRadious,
+                      radius: defaultBorderRadius,
                       fit: BoxFit.cover,
                     ),
             ),
@@ -61,7 +61,7 @@ class InnovationCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: getProportionateScreenHeight(10),
                       fontWeight: FontWeight.bold,
-                      color: kTextColor,
+                      color: textColor,
                     ),
                   ),
                   SizedBox(height: getProportionateScreenHeight(4)),

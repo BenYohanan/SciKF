@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' hide Category;
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_feeds/services/storage_keys.dart';
-import 'package:provider/provider.dart';
 
 import '../constants.dart';
 import '../model/auth_models.dart';
 import '../model/innovationDTO.dart';
 import '../model/innovation_model.dart';
 import '../model/user.dart';
-import '../providers/SciKFProvider.dart';
+import '../providers/sci_kf_notifier.dart';
 import 'StorageService.dart';
 
 class BaseHelperService {
@@ -40,7 +39,7 @@ class BaseHelperService {
     }
   }
 
-  Future<String> login(LoginModel model, BuildContext context) async {
+  Future<String> login(LoginModel model, WidgetRef ref) async{
     final response = await _client.post(
       Uri.parse('$baseUrl/Account/login'),
       headers: _getHeaders(),
@@ -64,15 +63,13 @@ class BaseHelperService {
       var approvedInnovations = (apiResponse['approvedInnovations'] as List)
           .map((item) => InnovationModel.fromJson(item))
           .toList();
-      final provider = Provider.of<SciKFProvider>(context, listen: false);
-      await provider.updateAfterLogin(
+      await ref.read(sciKFProvider.notifier).updateAfterLogin(
         user: user,
         recentInnovations: recentInnovations,
         flashInnovations: flashInnovations,
         myInnovations: myInnovations,
         approvedInnovations: approvedInnovations,
       );
-
       return "Successfully logged in";
     } else {
       var message = jsonDecode(response.body);
@@ -80,7 +77,7 @@ class BaseHelperService {
     }
   }
 
-  Future<void>ReloadData(BuildContext context, String userId) async {
+  Future<void> reloadData(WidgetRef ref, String userId) async {
     final response = await _client.get(
       Uri.parse('$baseUrl/Innovation/reload/$userId'),
       headers: _getHeaders(),
@@ -103,8 +100,7 @@ class BaseHelperService {
       var approvedInnovations = (apiResponse['approvedInnovations'] as List)
           .map((item) => InnovationModel.fromJson(item))
           .toList();
-      final provider = Provider.of<SciKFProvider>(context, listen: false);
-      await provider.reload(
+      await ref.read(sciKFProvider.notifier).reload(
         recentInnovations: recentInnovations,
         flashInnovations: flashInnovations,
         myInnovations: myInnovations,

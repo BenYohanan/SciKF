@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
 import 'package:news_feeds/services/storage_keys.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
 
 import '../../constants.dart';
-import '../../screens/innovation/views/innovation_details_screen.dart';
 import '../../services/StorageService.dart';
 import '../../size_config.dart';
+import '../loader.dart';
 import '../network_image_with_loader.dart';
 
-class CensorCard extends StatefulWidget {
+class CensorCard extends ConsumerStatefulWidget {
   const CensorCard({
     super.key,
     required this.image,
@@ -28,11 +29,12 @@ class CensorCard extends StatefulWidget {
   final int id;
 
   @override
-  State<CensorCard> createState() => _CensorCardState();
+  ConsumerState<CensorCard> createState() => _CensorCardState();
 }
 
-class _CensorCardState extends State<CensorCard> {
+class _CensorCardState extends ConsumerState<CensorCard> {
   BaseHelperService baseHelperService = BaseHelperService();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,11 +52,13 @@ class _CensorCardState extends State<CensorCard> {
                   child: Stack(
                     children: [
                       widget.image.isEmpty
-                          ? Image.asset('assets/img/NoImg.png',fit: BoxFit.cover,
+                          ? Image.asset(
+                        'assets/img/NoImg.png',
+                        fit: BoxFit.cover,
                       )
                           : NetworkImageWithLoader(
                         widget.image,
-                        radius: defaultBorderRadious,
+                        radius: defaultBorderRadius,
                       )
                     ],
                   ),
@@ -74,24 +78,23 @@ class _CensorCardState extends State<CensorCard> {
                         style: TextStyle(
                           fontSize: getProportionateScreenHeight(10),
                           fontWeight: FontWeight.w500,
-                          color:primaryColor,
+                          color: primaryColor,
                         ),
                       ),
                       SizedBox(height: getProportionateScreenHeight(5)),
                       Text(
-                        widget.category ?? "",
+                        widget.category,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: getProportionateScreenHeight(12),
                           fontWeight: FontWeight.w500,
-                          color:kTextColor,
+                          color: textColor,
                         ),
                       ),
                       SizedBox(height: getProportionateScreenHeight(5)),
                       Text(
-                        widget.author.isEmpty ? "":
-                        "Author: ${widget.author}",
+                        widget.author.isEmpty ? "" : "Author: ${widget.author}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall!.copyWith(fontSize: 12),
@@ -132,12 +135,12 @@ class _CensorCardState extends State<CensorCard> {
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
                     onPressed: () async {
-                      Dialogs.loader(context);
+                      AppLoader.show(context);
                       var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
                       await baseHelperService.approveInnovation(widget.id);
-                      await baseHelperService.ReloadData(context, myId!);
-                       Navigator.pop(context);
-                        Dialogs.flushBar(context,"Success", "Innovation Approved Successfully");
+                      await baseHelperService.reloadData(ref, myId!);
+                      Navigator.pop(context);
+                      Dialogs.flushBar(context, "Success", "Innovation Approved Successfully");
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -160,13 +163,13 @@ class _CensorCardState extends State<CensorCard> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
                   child: ElevatedButton(
-                    onPressed: ()async {
-                      Dialogs.loader(context);
+                    onPressed: () async {
+                      AppLoader.show(context);
                       var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
                       await baseHelperService.rejectInnovation(widget.id);
-                      await baseHelperService.ReloadData(context, myId!);
-                        Navigator.pop(context);
-                        Dialogs.flushBar(context,"Success", "Innovation rejected Successfully");
+                      await baseHelperService.reloadData(ref, myId!);
+                      Navigator.pop(context);
+                      Dialogs.flushBar(context, "Success", "Innovation rejected Successfully");
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
@@ -185,35 +188,6 @@ class _CensorCardState extends State<CensorCard> {
                   ),
                 ),
               ),
-              // Expanded(
-              //   child: Padding(
-              //     padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
-              //     child: ElevatedButton(
-              //       onPressed: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (context) => InnovationDetailsScreen(innovationModel: pendingInnovations[index]),
-              //           ),
-              //         );
-              //       },
-              //       style: ElevatedButton.styleFrom(
-              //         backgroundColor: Color(0xFF418C47),
-              //         foregroundColor: Colors.white,
-              //         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              //         minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
-              //         textStyle: TextStyle(
-              //           fontSize: getProportionateScreenHeight(12),
-              //           fontWeight: FontWeight.w500,
-              //         ),
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(8),
-              //         ),
-              //       ),
-              //       child: const Text("View"),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           Divider(

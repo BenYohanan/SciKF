@@ -28,7 +28,7 @@ class InnovationInfo extends StatelessWidget {
               style: TextStyle(
                 fontSize: getProportionateScreenHeight(20),
                 fontWeight: FontWeight.bold,
-                color: kTextColor,
+                color: textColor,
               ),
             ),
             SizedBox(height: getProportionateScreenHeight(2)),
@@ -37,7 +37,7 @@ class InnovationInfo extends StatelessWidget {
               style: TextStyle(
                 fontSize: getProportionateScreenHeight(16),
                 fontWeight: FontWeight.bold,
-                color: kTextColor,
+                color: textColor,
               ),
             ),
             SizedBox(height: getProportionateScreenHeight(2)),
@@ -51,7 +51,7 @@ class InnovationInfo extends StatelessWidget {
                 style: TextStyle(
                   fontSize: getProportionateScreenHeight(16),
                   fontWeight: FontWeight.bold,
-                  color: kTextColor,
+                  color: textColor,
                 ),
             ),
           ],

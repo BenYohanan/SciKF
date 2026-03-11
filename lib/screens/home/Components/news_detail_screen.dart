@@ -45,7 +45,7 @@ class NewsDetailScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Source: ${newsItem.source ?? "SciKF"}',
+                  'Source: ${newsItem.source}',
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(12),
                     color: primaryColor,

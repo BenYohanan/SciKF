@@ -33,7 +33,7 @@ class ScaffoldWrapper extends StatelessWidget {
                 'Funded by TETFund',
                 style: TextStyle(
                   fontSize: getProportionateScreenWidth(12),
-                  color: kTextColor.withOpacity(0.6),
+                  color: textColor.withOpacity(0.6),
                   fontWeight: FontWeight.w400,
                 ),
               ),

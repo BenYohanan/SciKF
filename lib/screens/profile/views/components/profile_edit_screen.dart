@@ -1,27 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/size_config.dart';
+import 'package:news_feeds/widgets/widget_helper.dart';
 
+import '../../../../components/custom_bottom_nav_bar.dart';
 import '../../../../components/network_image_with_loader.dart';
+import '../../../../providers/sci_kf_notifier.dart';
 
-class ProfileEditScreen extends StatefulWidget {
+class ProfileEditScreen extends ConsumerStatefulWidget {
   const ProfileEditScreen({super.key});
 
   @override
-  State<ProfileEditScreen> createState() => _ProfileEditScreenState();
+  ConsumerState<ProfileEditScreen> createState() => _ProfileEditScreenState();
 }
 
-class _ProfileEditScreenState extends State<ProfileEditScreen> {
-  String profileImage = 'https://i.imgur.com/IXnwbLk.png';
-  String name = 'SciKf Admin';
-  String email = 'admin@scikf.com';
-  String phone = '+1 202-555-0162';
+class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+
+  String profileImage = "";
+  @override
+  void initState() {
+    super.initState();
+
+    final user = ref.read(sciKFProvider).user;
+
+    if (user != null) {
+      nameController.text = user.fullName ?? "";
+      emailController.text = user.email ?? "";
+      phoneController.text = user.phoneNumber ?? "";
+      profileImage = user.profilePicture ?? "";
+    }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: CustomBottomNavBar(),
       appBar: AppBar(
         title: Text('Edit Profile'),
       ),
@@ -32,70 +60,76 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             vertical: getProportionateScreenHeight(20),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Stack(
+                child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: getProportionateScreenHeight(70),
-                      child: NetworkImageWithLoader(
-                        profileImage,
-                        radius: getProportionateScreenHeight(150),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: getProportionateScreenWidth(0),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: CircleAvatar(
-                          radius: getProportionateScreenHeight(25),
-                          backgroundColor: primaryColor,
-                          child: SvgPicture.asset(
-                            'assets/icons/Edit.svg',
-                            height: getProportionateScreenHeight(20),
-                            color: Colors.white,
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: getProportionateScreenHeight(70),
+                          child: profileImage.isNotEmpty
+                              ? NetworkImageWithLoader(
+                            profileImage,
+                            radius: 150,
+                          )
+                              : Icon(
+                            Icons.person,
+                            size: getProportionateScreenHeight(40),
+                            color: primaryColor,
                           ),
                         ),
+                        Positioned(
+                          bottom: 0,
+                          right: getProportionateScreenWidth(0),
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: CircleAvatar(
+                              radius: getProportionateScreenHeight(25),
+                              backgroundColor: primaryColor,
+                              child: SvgPicture.asset(
+                                'assets/icons/Edit.svg',
+                                height: getProportionateScreenHeight(20),
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: getProportionateScreenHeight(10)),
+
+                    Text(
+                      emailController.text,
+                      style: TextStyle(
+                        fontSize: getProportionateScreenHeight(14),
+                        color: Colors.grey[700],
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: getProportionateScreenHeight(20)),
+              SizedBox(height: getProportionateScreenHeight(30)),
               _buildProfileField(
                 icon: 'assets/icons/User.svg',
                 label: 'Name',
-                value: name,
-                onChanged: (value) => setState(() => name = value),
+                controller: nameController,
               ),
-              SizedBox(height: getProportionateScreenHeight(20)),
-              _buildProfileField(
-                icon: 'assets/icons/Email.svg',
-                label: 'Email',
-                value: email,
-                onChanged: (value) => setState(() => email = value),
-              ),
-              SizedBox(height: getProportionateScreenHeight(20)),
+              SizedBox(height: getProportionateScreenHeight(15)),
               _buildProfileField(
                 icon: 'assets/icons/Phone.svg',
                 label: 'Phone number',
-                value: phone,
-                onChanged: (value) => setState(() => phone = value),
+                controller: phoneController,
               ),
-              SizedBox(height: getProportionateScreenHeight(40)),
-              ElevatedButton(
+              SizedBox(height: getProportionateScreenHeight(20)),
+              WidgetHelper().buildModernButtonWithIcon(
+                svgName: "Edit Square.svg",
+                text: 'Save Changes',
+                color: primaryColor,
                 onPressed: () {
-                  Navigator.pushNamed(context, mainScreenRoute);
+                  Navigator.pushNamed(context, profileScreenRoute);
                 },
-                child: Text(
-                  "Done",
-                  style: TextStyle(
-                    fontSize: getProportionateScreenHeight(16),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
             ],
           ),
@@ -107,8 +141,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Widget _buildProfileField({
     required String icon,
     required String label,
-    required String value,
-    required ValueChanged<String> onChanged,
+    required TextEditingController controller
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: getProportionateScreenHeight(15)),
@@ -129,18 +162,21 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             fontSize: getProportionateScreenHeight(16),
           ),
           filled: true,
-          fillColor: Colors.grey[100],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
+          ),
+          enabledBorder:
+          OutlineInputBorder(borderSide: BorderSide(color: primaryColor)),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: primaryColor),
           ),
         ),
         style: TextStyle(
           color: Colors.black,
           fontSize: getProportionateScreenHeight(16),
         ),
-        onChanged: onChanged,
-        controller: TextEditingController(text: value),
+        controller: controller,
       ),
     );
   }

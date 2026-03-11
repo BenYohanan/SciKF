@@ -2,13 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:news_feeds/size_config.dart';
-const kTextColor = Colors.black87;
+const textColor = Colors.black87;
 
 const kAnimationDuration = Duration(milliseconds: 200);
 const primaryColor = Color(0xFF2E7D32);
 const defaultDuration = Duration(milliseconds: 250);
 const String baseUrl = "https://scikf.bivisoft.com/api";
+// const String baseUrl = "http://192.168.1.199/api";
 const String imgBaseUrl = "https://scikf.bivisoft.com";
+const String logo = "assets/img/icon.png";
+
 
 final RegExp emailValidatorRegExp =
 RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
@@ -32,10 +35,11 @@ final otpInputDecoration = InputDecoration(
 OutlineInputBorder outlineInputBorder() {
   return OutlineInputBorder(
     borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-    borderSide: const BorderSide(color: kTextColor),
+    borderSide: const BorderSide(color: textColor),
   );
 }
-
+const double defaultPadding = 16.0;
+const double defaultBorderRadius = 12.0;
 const grandisExtendedFont = "Grandis Extended";
 const MaterialColor primaryMaterialColor =
 MaterialColor(0xFF9581FF, <int, Color>{
@@ -75,9 +79,6 @@ const Color purpleColor = Color(0xFF7B61FF);
 const Color successColor = Color(0xFF2ED573);
 const Color warningColor = Color(0xFFFFBE21);
 const Color errorColor = Color(0xFFEA5B5B);
-
-const double defaultPadding = 16.0;
-const double defaultBorderRadious = 12.0;
 
 final passwordValidator = MultiValidator([
   RequiredValidator(errorText: 'Password is required')

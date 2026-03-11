@@ -39,7 +39,7 @@ class InnovationDetailsScreen extends StatelessWidget {
                       padding: EdgeInsets.all(getProportionateScreenHeight(10)),
                       child: ClipRRect(
                         borderRadius: const BorderRadius.all(
-                          Radius.circular(defaultBorderRadious * 2),
+                          Radius.circular(defaultBorderRadius * 2),
                         ),
                         child: innovationModel.image.isEmpty
                             ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)

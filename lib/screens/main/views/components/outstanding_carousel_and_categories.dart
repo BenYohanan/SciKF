@@ -28,7 +28,7 @@ class OutstandingCarouselAndCategories extends StatelessWidget {
             style: TextStyle(
               fontSize: getProportionateScreenHeight(16),
               fontWeight: FontWeight.bold,
-              color: kTextColor,
+              color: textColor,
             ),
           ),
         ),

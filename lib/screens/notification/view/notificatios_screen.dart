@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import '../../../components/custom_bottom_nav_bar.dart';
 import '../../../model/feed_item.dart';
 import '../../../size_config.dart';
 
@@ -29,6 +30,7 @@ class NotificationsScreen extends StatelessWidget {
       ),
     ];
     return Scaffold(
+      bottomNavigationBar: CustomBottomNavBar(),
       appBar: AppBar(
         title: const Text("Notifications"),
         actions: [

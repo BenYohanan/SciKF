@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
+import '../../components/loader.dart';
 import '../../model/news_item.dart';
 import '../../services/DatabaseHelper.dart';
 import '../../services/PromptService.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
-import '../../widgets/dialogs.dart';
 import 'Components/news_detail_screen.dart';
 import '../../widgets/scaffold_wrapper.dart';
 
@@ -40,7 +40,7 @@ class HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.connectionState == ConnectionState.active) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Dialogs.loader(context);
+              AppLoader.show(context);
             });
             return const SizedBox.shrink();
           }

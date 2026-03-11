@@ -1,5 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../constants.dart';
 import '../size_config.dart';
@@ -29,33 +30,6 @@ class WidgetHelper {
     );
   }
 
-  String stripHtml(String? htmlString) {
-    if (htmlString == null || htmlString.isEmpty) return '';
-    return htmlString.replaceAll(RegExp(r'<[^>]+>'), '');
-  }
-
-  DropDownDecoratorProps dropDownDecoratorProps(String labelText) {
-    return DropDownDecoratorProps(
-      dropdownSearchDecoration: InputDecoration(
-        labelText: labelText,
-        hintStyle: TextStyle(
-          color: Colors.grey.shade500,
-          fontStyle: FontStyle.italic,
-        ),
-        labelStyle: TextStyle(
-          color: primaryColor,
-          fontSize: getProportionateScreenHeight(14),
-        ),
-        border: OutlineInputBorder(),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: primaryColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: primaryColor),
-        ),
-      ),
-    );
-  }
 
   InputDecoration buildInputDecoration(String? labelText, String? hintText) {
     return InputDecoration(
@@ -76,42 +50,6 @@ class WidgetHelper {
         color: Colors.grey.shade700,
         fontSize: getProportionateScreenHeight(14),
       ),
-    );
-  }
-
-  bool checkIfIsLabourOrTravel(String partName) {
-    if(partName.isEmpty){
-      return true;
-    }else{
-      if(partName.toLowerCase() == "labour" || partName.toLowerCase() == "travel" ){
-        return false;
-      }
-      return true;
-    }
-  }
-
-  Widget buildDropdown<T>({
-    required String label,
-    required List<T> items,
-    required T? value,
-    required Function(T?) onChanged,
-    required String Function(T) itemAsString,
-    required Widget Function(T) itemBuilder,
-    String? Function(T?)? validator,
-  }) {
-    return DropdownSearch<T>(
-      popupProps: PopupProps.menu(
-        showSearchBox: true,
-        fit: FlexFit.loose
-      ),
-      dropdownDecoratorProps: dropDownDecoratorProps(label),
-      selectedItem: value,
-      items: items,
-      itemAsString: itemAsString,
-      dropdownBuilder: (context, selectedItem) =>
-      selectedItem != null ? itemBuilder(selectedItem) : const SizedBox(),
-      onChanged: onChanged,
-      validator: validator,
     );
   }
 
@@ -140,21 +78,86 @@ class WidgetHelper {
 
     );
   }
-}
-
-mixin BaseUrlChecker<T extends StatefulWidget> on State<T> {
-  String? baseUrl;
-  bool _hasCheckedBaseUrl = false;
-
-  void checkBaseUrl() {
-    if (_hasCheckedBaseUrl || !mounted) return;
-    _hasCheckedBaseUrl = true;
-    if (baseUrl == null || baseUrl!.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/auth_type');
-        }
-      });
-    }
+  Widget buildUploadField({
+    required String label,
+    required String? fileName,
+    required Function() onTap,
+    String? placeHolder,
+    IconData icon = Icons.upload_file,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: InputDecorator(
+        decoration: buildInputDecoration(label, placeHolder),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                fileName ?? placeHolder ?? "Upload file",
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: fileName == null ? Colors.grey : Colors.black,
+                ),
+              ),
+            ),
+            Icon(icon, color: primaryColor),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget buildModernButtonWithIcon({
+    required String text,
+    required Color color,
+    String? svgName,
+    required VoidCallback? onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: svgName != null
+          ? SvgPicture.asset(
+        "assets/icons/$svgName",
+        color: Colors.white,
+        height: getProportionateScreenHeight(20),
+      )
+          : const SizedBox.shrink(),
+      label: Text(text),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        elevation: 2,
+        textStyle: TextStyle(fontSize: getProportionateScreenHeight(16), fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+  DropDownDecoratorProps dropDownDecoratorProps(String labelText) {
+    return DropDownDecoratorProps(
+      decoration: InputDecoration(
+        fillColor: Colors.white,
+        filled: true,
+        labelText: labelText,
+        hintStyle: TextStyle(
+          color: Colors.grey.shade500,
+          fontStyle: FontStyle.italic,
+        ),
+        labelStyle: TextStyle(
+          color: Colors.grey.shade700,
+          fontSize: getProportionateScreenHeight(14),
+        ),
+        border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor),
+        ),
+      ),
+    );
   }
 }
+

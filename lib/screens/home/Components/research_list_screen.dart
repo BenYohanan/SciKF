@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../components/loader.dart';
 import '../../../constants.dart';
 import '../../../model/news_item.dart';
 import '../../../services/DatabaseHelper.dart';
@@ -38,7 +39,7 @@ class _ResearchListScreenState extends State<ResearchListScreen> {
           if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.connectionState == ConnectionState.active) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Dialogs.loader(context);
+              AppLoader.show(context);
             });
             return const SizedBox.shrink();
           }

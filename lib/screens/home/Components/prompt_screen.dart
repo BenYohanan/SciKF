@@ -6,6 +6,7 @@ import 'package:news_feeds/services/PromptService.dart';
 import 'package:news_feeds/components/custom_app_bar.dart';
 import 'package:news_feeds/components/custom_bottom_nav_bar.dart';
 import 'package:news_feeds/widgets/widget_helper.dart';
+import '../../../components/loader.dart';
 import '../../../services/DatabaseHelper.dart';
 import 'news_detail_screen.dart';
 
@@ -33,7 +34,7 @@ class _PromptScreenState extends State<PromptScreen> {
       return;
     }
 
-    Dialogs.loader(context);
+    AppLoader.show(context);
     FocusScope.of(context).unfocus();
 
     try {

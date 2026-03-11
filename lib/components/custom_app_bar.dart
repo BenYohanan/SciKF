@@ -1,175 +1,157 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:news_feeds/constants.dart';
-import 'package:news_feeds/size_config.dart';
-import 'package:news_feeds/route/route_constants.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget? drawer;
+import '../constants.dart';
+import '../route/route_constants.dart';
+import '../size_config.dart';
 
-  const CustomAppBar({super.key, this.drawer});
+class CustomAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
+  const CustomAppBar({
+    super.key,
+    this.pageHeader,
+  });
+
+  final String? pageHeader;
+
+  @override
+  ConsumerState<CustomAppBar> createState() => _CustomAppBarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
 
-  static Widget get defaultDrawer => Drawer(
-    backgroundColor: Colors.white,
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        DrawerHeader(
-          decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(16),
-              bottomRight: Radius.circular(16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'SciKF',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: getProportionateScreenHeight(24),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        _buildListTile(
-          iconPath: 'assets/icons/Prompt.svg',
-          title: 'Discover',
-          route: promptScreenRoute,
-        ),
-        _buildListTile(
-          iconPath: 'assets/icons/Add.svg',
-          title: 'Post an innovation',
-          route: postAnInnovationScreenRoute,
-        ),
-        _buildListTile(
-          iconPath: 'assets/icons/Innovations.svg',
-          title: 'My Innovations',
-          route: "",
-        ),
-      ],
-    ),
-  );
+class _CustomAppBarState extends ConsumerState<CustomAppBar>
+    with SingleTickerProviderStateMixin {
 
-  static Widget _buildListTile({
-    required String iconPath,
-    required String title,
-    required String route,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: getProportionateScreenWidth(8),
-        vertical: getProportionateScreenHeight(4),
-      ),
-      child: Card(
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: ListTile(
-          leading: SvgPicture.asset(
-            iconPath,
-            height: getProportionateScreenHeight(24),
-            color: primaryColor, // SVG icon in primaryColor
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              color: Colors.black, // Text in black
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          onTap: () {
-            Navigator.pop(navigatorKey.currentContext!); // Close the drawer
-            Navigator.pushNamed(navigatorKey.currentContext!, route);
-          },
-          hoverColor: primaryColor.withOpacity(0.1), // Subtle hover effect
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  final unreadCount = 1;
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
     );
+
+    _animation = Tween<double>(begin: -0.2, end: 0.2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _controller.repeat(reverse: true);
   }
 
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      leading: GestureDetector(
-        child: Image.asset(
-          'assets/img/icon.png',
-          width: getProportionateScreenWidth(50),
-          height: getProportionateScreenHeight(20),
+    // final notifications = ref.watch(notificationsProvider);
+    // final unreadCount = notifications.where((n) => !n.read).length;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: primaryColor, width: 1.0),
         ),
       ),
-      centerTitle: false,
-      title: Row(
-        children: [
-          Text(
-            'SciKF',
-            style: TextStyle(
-              fontSize: getProportionateScreenHeight(20),
-              fontWeight: FontWeight.bold,
+      child: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/');
+          },
+          child: Padding(
+            padding: EdgeInsets.only(left: getProportionateScreenHeight(16)),
+            child: Image.asset(
+              logo,
+              width: getProportionateScreenWidth(50),
+              height: getProportionateScreenHeight(20),
+            ),
+          ),
+        ),
+        title: Text(
+           'Scinexa',
+          style: TextStyle(
+            fontSize: getProportionateScreenHeight(20),
+            fontWeight: FontWeight.bold,
+            color: primaryColor,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, searchScreenRoute);
+            },
+            icon: SvgPicture.asset(
+              "assets/icons/Search.svg",
+              height: getProportionateScreenHeight(24),
               color: primaryColor,
             ),
           ),
+          SizedBox(width: getProportionateScreenHeight(8)),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, notificationsScreenRoute);
+                },
+                icon: unreadCount > 0
+                    ? AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _animation.value,
+                      child: child,
+                    );
+                  },
+                  child: SvgPicture.asset(
+                    "assets/icons/Notification.svg",
+                    height: getProportionateScreenHeight(24),
+                    color: primaryColor,
+                  ),
+                )
+                    : SvgPicture.asset(
+                  "assets/icons/Notification.svg",
+                  height: getProportionateScreenHeight(24),
+                  color: primaryColor,
+                ),
+              ),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                    child: Text(
+                      unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(width: getProportionateScreenHeight(8)),
         ],
       ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, searchScreenRoute);
-          },
-          icon: SvgPicture.asset(
-            "assets/icons/Search.svg",
-            height: 24,
-            color: primaryColor,
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, notificationsScreenRoute);
-          },
-          icon: SvgPicture.asset(
-            "assets/icons/Notification.svg",
-            height: 24,
-            color: primaryColor,
-          ),
-        ),
-        // Builder(
-        //   builder: (context) => IconButton(
-        //     onPressed: () {
-        //       Scaffold.of(context).openDrawer();
-        //     },
-        //     icon: SvgPicture.asset(
-        //       "assets/icons/Login.svg",
-        //       height: 24,
-        //       color: primaryColor,
-        //     ),
-        //   ),
-        // ),
-        SizedBox(width: getProportionateScreenHeight(20)),
-      ],
     );
   }
 }

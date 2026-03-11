@@ -1,101 +1,172 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
+import 'package:news_feeds/route/route_constants.dart';
 import '../../constants.dart';
-import '../providers/SciKFProvider.dart';
-import '../route/route_constants.dart';
+import '../size_config.dart';
 
-class CustomBottomNavBar extends StatefulWidget {
-  CustomBottomNavBar({ super.key});
+class CustomBottomNavBar extends ConsumerStatefulWidget {
+
   @override
-  State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
+  ConsumerState<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
 
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> with RouteAware {
-  final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
-  int _currentIndex = 0;
+class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
+  static int _selectedLUTIndex = 0;
+  bool _isNavigating = false;
+  final GlobalKey _homeKey = GlobalKey();
+  final GlobalKey _newsFeedKey = GlobalKey();
+  final GlobalKey _askAIKey = GlobalKey();
+  final GlobalKey _innovationKey = GlobalKey();
+  final GlobalKey _menuKey = GlobalKey();
 
-  void _navigateToScreen(int index) {
+  void _onItemTapped(int index) {
     setState(() {
-      _currentIndex = index;
+      _selectedLUTIndex = index;
     });
-    Navigator.pushReplacementNamed(
-      context,
-      [
-        mainScreenRoute,
-        homeScreenRoute,
-        promptScreenRoute,
-        approvedInnovationsScreenRoute,
-        profileScreenRoute,
-      ][index],
-    );
   }
-
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<SciKFProvider>(context);
-    final user = authProvider.user;
-    SvgPicture svgIcon(String src, {Color? color}) {
-      return SvgPicture.asset(
-        src,
-        height: 24,
-        colorFilter: ColorFilter.mode(
-          color ??
-              Theme.of(context).iconTheme.color!.withOpacity(
-                Theme.of(context).brightness == Brightness.dark ? 0.3 : 1,
-              ),
-          BlendMode.srcIn,
+    return BottomNavigationBar(
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            "assets/icons/Category.svg",
+            key: _homeKey,
+            color: _selectedLUTIndex == 0 ? primaryColor : Colors.black54,
+            height: getProportionateScreenHeight(20),
+          ),
+          label: 'Home',
         ),
-      );
-    }
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            "assets/icons/Environmental.svg",
+            key: _newsFeedKey,
+            color: _selectedLUTIndex == 1 ? primaryColor : Colors.black54,
+            height: getProportionateScreenHeight(20),
+          ),
+          label: 'News Feed',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            "assets/icons/Prompt.svg",
+            key: _askAIKey,
+            color: _selectedLUTIndex == 2 ? primaryColor : Colors.black54,
+            height: getProportionateScreenHeight(20),
+          ),
+          label: 'Prompt',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            "assets/icons/Innovations.svg",
+            key: _innovationKey,
+            color: _selectedLUTIndex == 3 ? primaryColor : Colors.black54,
+            height: getProportionateScreenHeight(20),
+          ),
+          label: 'Innovations',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            "assets/icons/Menu.svg",
+            key: _menuKey,
+            color:_selectedLUTIndex == 4 ? primaryColor : Colors.black54,
+            height: getProportionateScreenHeight(20),
+          ),
+          label: 'Menu',
+        ),
+      ],
+      onTap: (index) async {
+        if (_isNavigating) return;
+        _onItemTapped(index);
+        setState(() {
+          _isNavigating = true;
+        });
+        String? route;
+        switch (index) {
+          case 0:
+            route = mainScreenRoute;
+            break;
+          case 1:
+            route = homeScreenRoute;
+            break;
+          case 2:
+            route = promptScreenRoute;
+            break;
+          case 3:
+            route =  approvedInnovationsScreenRoute;
+            break;
+          case 4:
+            route = profileScreenRoute;
+            break;
+        }
 
-    return Container(
-      padding: const EdgeInsets.only(top: defaultPadding / 2),
-      color: Theme.of(context).brightness == Brightness.light
-          ? Colors.white
-          : const Color(0xFF101015),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: Theme.of(context).brightness == Brightness.light
-            ? Colors.white
-            : const Color(0xFF101015),
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 12,
-        selectedItemColor: primaryColor,
-        unselectedItemColor: Colors.transparent,
-        onTap: (index) {
-          _navigateToScreen(index);
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: svgIcon("assets/icons/Category.svg"),
-            activeIcon: svgIcon("assets/icons/Category.svg", color: primaryColor),
-            label: "Main",
-          ),
-          BottomNavigationBarItem(
-            icon: svgIcon("assets/icons/home.svg"),
-            activeIcon: svgIcon("assets/icons/home.svg", color: primaryColor),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: svgIcon("assets/icons/Prompt.svg"),
-            activeIcon: svgIcon("assets/icons/Prompt.svg", color: primaryColor),
-            label: "Prompt",
-          ),
-          BottomNavigationBarItem(
-            icon: svgIcon("assets/icons/Bookmark.svg"),
-            activeIcon: svgIcon("assets/icons/Bookmark.svg", color: primaryColor),
-            label: "Innovations",
-          ),
-        if (user != null && user.id!.isNotEmpty)
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/Profile.svg"),
-              activeIcon: svgIcon("assets/icons/Profile.svg", color: primaryColor),
-              label: "Profile",
-            ),
-        ],
-      ),
+        if (route != null && ModalRoute.of(context)?.settings.name == route) {
+          setState(() {
+            _isNavigating = false;
+          });
+          return;
+        }
+
+        switch (index) {
+          case 0:
+            Navigator.pushReplacementNamed(context, mainScreenRoute).then((_) {
+              if (mounted) {
+                setState(() {
+                  _isNavigating = false;
+                });
+              }
+            });
+            break;
+          case 1:
+            Navigator.pushNamed(context, homeScreenRoute).then((_) {
+              if (mounted) {
+                setState(() {
+                  _isNavigating = false;
+                });
+              }
+            });
+            break;
+          case 2:
+            Navigator.pushNamed(context, promptScreenRoute).then((_) {
+              if (mounted) {
+                setState(() {
+                  _isNavigating = false;
+                });
+              }
+            });
+            break;
+          case 3:
+            Navigator.pushNamed(context, approvedInnovationsScreenRoute).then((_) {
+              if (mounted) {
+                setState(() {
+                  _isNavigating = false;
+                });
+              }
+            });
+            break;
+          case 4:
+            Navigator.pushNamed(context, profileScreenRoute).then((_) {
+              if (mounted) {
+                setState(() {
+                  _isNavigating = false;
+                });
+              }
+            });
+            break;
+        }
+      },
+      currentIndex: _selectedLUTIndex,
+      backgroundColor: Colors.white,
+      type: BottomNavigationBarType.fixed,
+      selectedFontSize: getProportionateScreenHeight(12),
+      selectedItemColor: primaryColor,
+      unselectedItemColor: textColor,
+      elevation: 0,
+      unselectedFontSize: getProportionateScreenHeight(10),
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+      showUnselectedLabels: true,
     );
   }
 }

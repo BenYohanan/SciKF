@@ -4,14 +4,12 @@ import 'package:news_feeds/screens/innovation/views/approvedInnovations_screen.d
 import '../screens/home/index.dart';
 import '../screens/innovation/views/added_for_review_message_screen.dart';
 import '../screens/innovation/views/censorship_innovations_page.dart';
-import '../screens/innovation/views/innovation_details_screen.dart';
 import '../screens/innovation/views/my_innovation/index_screen.dart';
 import '../screens/main/views/main_screen.dart';
 import '../screens/notification/view/notificatios_screen.dart';
 import '../screens/preferences/views/preferences_screen.dart';
 import '../screens/innovation/views/add_innovation_screen.dart';
 import '../screens/profile/views/components/profile_edit_screen.dart';
-import '../screens/profile/views/components/profile_view_screen.dart';
 import '../screens/profile/views/profile_screen.dart';
 import '../screens/home/Components/prompt_screen.dart';
 import '../screens/home/Components/research_list_screen.dart';
@@ -49,7 +47,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const PreferencesScreen());
     case postAnInnovationScreenRoute:
       return MaterialPageRoute(
-        builder: (context) => PostInnovationScreen(dbHelper: DatabaseHelper()),
+        builder: (context) => PostInnovationScreen(),
       );
     case profileScreenRoute:
       return MaterialPageRoute(builder: (context) => const ProfileScreen());
@@ -63,8 +61,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case editUserInfoScreenRoute:
       return MaterialPageRoute(builder: (context) => const ProfileEditScreen());
-    case userInfoScreenRoute:
-      return MaterialPageRoute(builder: (context) => const ProfileViewScreen());
     case searchScreenRoute:
       return MaterialPageRoute(builder: (context) => const SearchScreen());
     case addedForReviewMessageScreenRoute:

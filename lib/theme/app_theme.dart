@@ -28,6 +28,7 @@ class AppTheme {
       appBarTheme: appBarLightTheme,
       scrollbarTheme: scrollbarThemeData,
       dataTableTheme: dataTableLightThemeData,
+      cardColor: Colors.white,
     );
   }
 }

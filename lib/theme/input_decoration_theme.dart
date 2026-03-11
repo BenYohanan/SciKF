@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 const InputDecorationTheme lightInputDecorationTheme = InputDecorationTheme(
-  fillColor: lightGreyColor,
   filled: true,
+  fillColor: Colors.white,
   hintStyle: TextStyle(color: greyColor),
   border: outlineInputBorder,
   enabledBorder: outlineInputBorder,
@@ -12,30 +12,21 @@ const InputDecorationTheme lightInputDecorationTheme = InputDecorationTheme(
   errorBorder: errorOutlineInputBorder,
 );
 
-const InputDecorationTheme darkInputDecorationTheme = InputDecorationTheme(
-  fillColor: darkGreyColor,
-  filled: true,
-  hintStyle: TextStyle(color: whileColor40),
-  border: outlineInputBorder,
-  enabledBorder: outlineInputBorder,
-  focusedBorder: focusedOutlineInputBorder,
-  errorBorder: errorOutlineInputBorder,
-);
 
 const OutlineInputBorder outlineInputBorder = OutlineInputBorder(
-  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
+  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadius)),
   borderSide: BorderSide(
-    color: Colors.transparent,
+    color: textColor,
   ),
 );
 
 const OutlineInputBorder focusedOutlineInputBorder = OutlineInputBorder(
-  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
+  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadius)),
   borderSide: BorderSide(color: primaryColor),
 );
 
 const OutlineInputBorder errorOutlineInputBorder = OutlineInputBorder(
-  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadious)),
+  borderRadius: BorderRadius.all(Radius.circular(defaultBorderRadius)),
   borderSide: BorderSide(
     color: errorColor,
   ),
@@ -43,7 +34,7 @@ const OutlineInputBorder errorOutlineInputBorder = OutlineInputBorder(
 
 OutlineInputBorder secodaryOutlineInputBorder(BuildContext context) {
   return OutlineInputBorder(
-    borderRadius: const BorderRadius.all(Radius.circular(defaultBorderRadious)),
+    borderRadius: const BorderRadius.all(Radius.circular(defaultBorderRadius)),
     borderSide: BorderSide(
       color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.15),
     ),

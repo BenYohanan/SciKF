@@ -40,7 +40,7 @@ class SecondaryFindingsCard extends StatelessWidget {
                   )
                       : NetworkImageWithLoader(
                     image,
-                    radius: defaultBorderRadious,
+                    radius: defaultBorderRadius,
                   ),
                 ],
               ),
@@ -89,7 +89,7 @@ class SecondaryFindingsCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: kTextColor,
+                      color: textColor,
                       fontSize: getProportionateScreenHeight(10),
                     ),
                   ),
@@ -108,7 +108,7 @@ class SecondaryFindingsCard extends StatelessWidget {
                       Text(
                         date ?? '',
                         style: TextStyle(
-                          color: kTextColor,
+                          color: textColor,
                           fontSize: getProportionateScreenHeight(10),
                         ),
                       ),

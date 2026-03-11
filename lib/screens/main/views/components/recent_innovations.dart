@@ -27,7 +27,7 @@ class RecentInnovations extends StatelessWidget {
             style: TextStyle(
               fontSize: getProportionateScreenHeight(12),
               fontWeight: FontWeight.bold,
-              color: kTextColor,
+              color: textColor,
             ),
           ),
         ),
