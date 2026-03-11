@@ -23,11 +23,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(defaultPadding),
+                padding: EdgeInsetsGeometry.all(getProportionateScreenHeight(15)),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
+                      textAlign: TextAlign.center,
                       "Let’s get started!",
                       style: TextStyle(
                         fontSize: getProportionateScreenHeight(30),
@@ -35,11 +35,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         color: primaryColor,
                       ),
                     ),
-                    const SizedBox(height: defaultPadding / 2),
-                    const Text(
+                    SizedBox(height: getProportionateScreenHeight(3)),
+                    Text(
                       "Create an account to continue",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: getProportionateScreenHeight(14),
+                      ),
                     ),
-                    const SizedBox(height: defaultPadding),
+                    SizedBox(height: getProportionateScreenHeight(20)),
                     SignUpForm(formKey: _formKey),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +54,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Navigator.pushNamed(context, logInScreenRoute);
                           },
                           child: Text(
-                            "Log in",
+                            "Sign in",
                             style: TextStyle(
                               fontSize: getProportionateScreenHeight(14),
                               fontWeight: FontWeight.bold,

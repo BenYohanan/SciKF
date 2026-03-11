@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:news_feeds/model/innovation_model.dart';
-
-import '../../../../components/skleton/others/categories_skelton.dart';
-import '../../../../components/skleton/others/offers_skelton.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 import 'categories.dart';

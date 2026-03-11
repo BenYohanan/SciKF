@@ -7,7 +7,6 @@ import '../../../services/PromptService.dart';
 import '../../../size_config.dart';
 import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
-import '../../../widgets/dialogs.dart';
 import 'news_detail_screen.dart';
 
 class ResearchListScreen extends StatefulWidget {

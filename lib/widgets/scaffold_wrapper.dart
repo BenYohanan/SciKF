@@ -19,7 +19,6 @@ class ScaffoldWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? Colors.grey[200],
       appBar: appBar,
       body: Stack(
         children: [

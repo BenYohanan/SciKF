@@ -33,9 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: primaryColor,
                   ),
                 ),
-                SizedBox(height: getProportionateScreenHeight(15)),
+                SizedBox(height: getProportionateScreenHeight(3)),
                 Text(
-                  "Log in to access your dashboard and manage your projects.",
+                  "Log in to access your dashboard",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(14),

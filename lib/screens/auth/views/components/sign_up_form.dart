@@ -8,6 +8,7 @@ import '../../../../route/route_constants.dart';
 import '../../../../services/BaseHelperService.dart';
 import '../../../../size_config.dart';
 import '../../../../widgets/dialogs.dart';
+import 'customSuffixIcon.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({
@@ -28,121 +29,29 @@ class _SignUpFormState extends State<SignUpForm> {
   final _phoneNumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _service = BaseHelperService();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  String _passWordIcon = "assets/icons/View Lock.svg";
+  bool _passObscured = true;
+  final List<String> _errors = [];
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = SizeConfig.screenWidth;
     return Form(
       key: widget.formKey,
       child: Column(
         children: [
-          TextFormField(
-            controller: _fullNameController,
-            cursorColor: primaryColor,
-            decoration: InputDecoration(
-              hintText: "Username",
-              prefixIcon: Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: defaultPadding * 0.75),
-                child: SvgPicture.asset(
-                  "assets/icons/User.svg",
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .color!
-                        .withOpacity(0.3),
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: defaultPadding),
-          TextFormField(
-            controller: _emailController,
-            validator: emaildValidator.call,
-            textInputAction: TextInputAction.next,
-            cursorColor: primaryColor,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              hintText: "Email address",
-              prefixIcon: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: defaultPadding * 0.75),
-                child: SvgPicture.asset(
-                  "assets/icons/Message.svg",
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .color!
-                        .withOpacity(0.3),
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: defaultPadding),
-          TextFormField(
-            controller: _phoneNumberController,
-            cursorColor: primaryColor,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              hintText: "Phone Number",
-              prefixIcon: Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: defaultPadding * 0.75),
-                child: SvgPicture.asset(
-                  "assets/icons/Phone.svg",
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .color!
-                        .withOpacity(0.3),
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: defaultPadding),
-          TextFormField(
-           controller: _passwordController,
-            cursorColor: primaryColor,
-            validator: passwordValidator.call,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: "Password",
-              prefixIcon: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: defaultPadding * 0.75),
-                child: SvgPicture.asset(
-                  "assets/icons/Lock.svg",
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .color!
-                        .withOpacity(0.3),
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: defaultPadding * 2),
-          ElevatedButton(
-            onPressed: () async {
+          _buildFullNameFormField(),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          _buildEmailFormField(),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          _buildPhoneFormField(),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          _buildPasswordFormField(),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          GestureDetector(
+            onTap: () async {
               if (widget.formKey.currentState!.validate()) {
                 bool isDialogShown = false;
                 if (mounted) {
@@ -195,16 +104,208 @@ class _SignUpFormState extends State<SignUpForm> {
                 }
               }
             },
-            child: Text(
-              "Sign Up",
-              style: TextStyle(
-                fontSize: getProportionateScreenHeight(16),
-                fontWeight: FontWeight.bold,
+            child: Container(
+              height: getProportionateScreenHeight(50),
+              width: screenWidth,
+              margin: EdgeInsets.only(top: getProportionateScreenHeight(20)),
+              decoration: const BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+              ),
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/Send.svg",
+                      height: getProportionateScreenWidth(18),
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: getProportionateScreenWidth(10)),
+                    Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.w800,
+                        fontSize: getProportionateScreenWidth(17),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+  Widget _buildEmailFormField() {
+    return TextFormField(
+      cursorColor: primaryColor,
+      controller: _emailController,
+      focusNode: _emailFocus,
+      keyboardType: TextInputType.emailAddress,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          _removeError(error: kEmailNullError);
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          _addError(error: kEmailNullError);
+          return kEmailNullError;
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(
+          color: textColor,
+          fontSize: getProportionateScreenWidth(14),
+          fontWeight: FontWeight.w600,
+        ),
+        labelText: "Email",
+        hintText: "Enter your email",
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSuffixIcon(
+          svgIcon: "assets/icons/Mail.svg",
+          color: primaryColor,
+        ),
+      ),
+    );
+  }
+  Widget _buildPhoneFormField() {
+    return TextFormField(
+      cursorColor: primaryColor,
+      controller: _phoneNumberController,
+      keyboardType: TextInputType.phone,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          _removeError(error: kPhoneNumberNullError);
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          _addError(error: kPhoneNumberNullError);
+          return kPhoneNumberNullError;
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(
+          color: textColor,
+          fontSize: getProportionateScreenWidth(14),
+          fontWeight: FontWeight.w600,
+        ),
+        labelText: "Phone Number",
+        hintText: "Enter your phone number",
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSuffixIcon(
+          svgIcon: "assets/icons/Phone.svg",
+          color: primaryColor,
+        ),
+      ),
+    );
+  }
+  Widget _buildPasswordFormField() {
+    return TextFormField(
+      cursorColor: primaryColor,
+      obscureText: _passObscured,
+      controller: _passwordController,
+      focusNode: _passwordFocus,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          _removeError(error: kPassNullError);
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          _addError(error: kPassNullError);
+          return kPassNullError;
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(
+          color: textColor,
+          fontSize: getProportionateScreenWidth(14),
+          fontWeight: FontWeight.w600,
+        ),
+        labelText: "Password",
+        hintText: "Enter your password",
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: GestureDetector(
+          onTap: () {
+            setState(() {
+              _passObscured = !_passObscured;
+              _passWordIcon = _passObscured ? "assets/icons/View Lock.svg" : "assets/icons/View.svg";
+            });
+          },
+          child: CustomSuffixIcon(
+            svgIcon: _passWordIcon,
+            color: primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildFullNameFormField() {
+    return TextFormField(
+      cursorColor: primaryColor,
+      controller: _fullNameController,
+      keyboardType: TextInputType.text,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          _removeError(error: kNameNullError);
+        }
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          _addError(error: kNameNullError);
+          return kNameNullError;
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        floatingLabelStyle: TextStyle(
+          color: textColor,
+          fontSize: getProportionateScreenWidth(14),
+          fontWeight: FontWeight.w600,
+        ),
+        labelText: "Full Name",
+        hintText: "Enter your full name",
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor, style: BorderStyle.solid),
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSuffixIcon(
+          svgIcon: "assets/icons/User.svg",
+          color: primaryColor,
+        ),
+      ),
+    );
+  }
+  void _addError({required String error}) {
+    if (!_errors.contains(error)) {
+      setState(() => _errors.add(error));
+    }
+  }
+  void _removeError({required String error}) {
+    if (_errors.contains(error)) {
+      setState(() => _errors.remove(error));
+    }
   }
 }

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:news_feeds/size_config.dart';
 
 import '../../../../components/innovation/innovation_card.dart';
-import '../../../../components/skleton/innovation/products_skelton.dart';
 import '../../../../constants.dart';
 import '../../../../model/innovation_model.dart';
-import '../../../../route/route_constants.dart';
 import '../../../innovation/views/innovation_details_screen.dart';
 
 class RecentInnovations extends StatelessWidget {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:news_feeds/widgets/widget_helper.dart';
 
 import '../../../../components/loader.dart';
 import '../../../../constants.dart';
@@ -11,7 +10,7 @@ import '../../../../services/BaseHelperService.dart';
 import '../../../../services/StorageService.dart';
 import '../../../../size_config.dart';
 import '../../../../widgets/dialogs.dart';
-import 'custom_suffix_icon.dart';
+import 'customSuffixIcon.dart';
 
 class LogInForm extends ConsumerStatefulWidget {
   const LogInForm({
@@ -55,23 +54,27 @@ class _LogInFormState extends ConsumerState<LogInForm> {
           _buildUserNameFormField(),
            SizedBox(height: getProportionateScreenHeight(15)),
           _buildPasswordFormField(),
-          Align(
-            child: TextButton(
-              child: Text(
-                "Forgot password",
-                style: TextStyle(
-                  fontSize: getProportionateScreenHeight(14),
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
+          SizedBox(height: getProportionateScreenHeight(15)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    passwordRecoveryScreenRoute,
+                  );
+                },
+                child: Text(
+                  "Forgot password?",
+                  style: TextStyle(
+                    fontSize: getProportionateScreenHeight(12),
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
                 ),
               ),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  passwordRecoveryScreenRoute,
-                );
-              },
-            ),
+            ],
           ),
           GestureDetector(
             onTap: () async {
@@ -235,14 +238,14 @@ class _LogInFormState extends ConsumerState<LogInForm> {
           fontSize: getProportionateScreenWidth(14),
           fontWeight: FontWeight.w600,
         ),
-        labelText: "Email or Phone Number",
-        hintText: "Enter your email or phone",
+        labelText: "Email",
+        hintText: "Enter your email",
         border: const OutlineInputBorder(
           borderSide: BorderSide(color: primaryColor, style: BorderStyle.solid),
           borderRadius: BorderRadius.all(Radius.circular(14)),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: custom_suffix_icon(
+        suffixIcon: CustomSuffixIcon(
           svgIcon: "assets/icons/Mail.svg",
           color: primaryColor,
         ),
@@ -288,7 +291,7 @@ class _LogInFormState extends ConsumerState<LogInForm> {
               _passWordIcon = _passObscured ? "assets/icons/View Lock.svg" : "assets/icons/View.svg";
             });
           },
-          child: custom_suffix_icon(
+          child: CustomSuffixIcon(
             svgIcon: _passWordIcon,
             color: primaryColor,
           ),

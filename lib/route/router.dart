@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/screens/innovation/views/approvedInnovations_screen.dart';
 
+import '../screens/auth/views/login_screen.dart';
+import '../screens/auth/views/password_recovery_screen.dart';
+import '../screens/auth/views/signup_screen.dart';
 import '../screens/home/index.dart';
 import '../screens/innovation/views/added_for_review_message_screen.dart';
 import '../screens/innovation/views/censorship_innovations_page.dart';
 import '../screens/innovation/views/my_innovation/index_screen.dart';
 import '../screens/main/views/main_screen.dart';
 import '../screens/notification/view/notificatios_screen.dart';
-import '../screens/preferences/views/preferences_screen.dart';
 import '../screens/innovation/views/add_innovation_screen.dart';
+import '../screens/onbording/views/onbording_screnn.dart';
 import '../screens/profile/views/components/profile_edit_screen.dart';
 import '../screens/profile/views/profile_screen.dart';
 import '../screens/home/Components/prompt_screen.dart';
 import '../screens/home/Components/research_list_screen.dart';
 import '../screens/search/views/search_screen.dart';
 import '../services/DatabaseHelper.dart';
-import 'screen_export.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -43,8 +46,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => const PasswordRecoveryScreen(),
       );
-    case preferencesScreenRoute:
-      return MaterialPageRoute(builder: (context) => const PreferencesScreen());
     case postAnInnovationScreenRoute:
       return MaterialPageRoute(
         builder: (context) => PostInnovationScreen(),
