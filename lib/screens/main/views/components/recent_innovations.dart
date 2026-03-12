@@ -6,12 +6,18 @@ import '../../../../constants.dart';
 import '../../../../model/innovation_model.dart';
 import '../../../innovation/views/innovation_details_screen.dart';
 
-class RecentInnovations extends StatelessWidget {
+class RecentInnovations extends StatefulWidget {
   RecentInnovations({
     super.key,
     required this.recentInnovations,
   });
   List<InnovationModel> recentInnovations = [];
+
+  @override
+  State<RecentInnovations> createState() => _RecentInnovationsState();
+}
+
+class _RecentInnovationsState extends State<RecentInnovations> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,24 +39,24 @@ class RecentInnovations extends StatelessWidget {
           height: getProportionateScreenHeight(270),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: recentInnovations.length,
+            itemCount: widget.recentInnovations.length,
             itemBuilder: (context, index) => Padding(
               padding: EdgeInsets.only(
                 left: defaultPadding,
-                right: index == recentInnovations.length - 1
+                right: index == widget.recentInnovations.length - 1
                     ? getProportionateScreenHeight(16)
                     : 0,
               ),
               child: InnovationCard(
-                image: recentInnovations[index].image,
-                author: recentInnovations[index].author,
-                title: recentInnovations[index].title,
-                category: recentInnovations[index].category,
+                image: widget.recentInnovations[index].image,
+                author: widget.recentInnovations[index].author,
+                title: widget.recentInnovations[index].title,
+                category: widget.recentInnovations[index].category,
                 press: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => InnovationDetailsScreen(innovationModel: recentInnovations[index]),
+                      builder: (context) => InnovationDetailsScreen(innovationModel: widget.recentInnovations[index]),
                     ),
                   );
                 },

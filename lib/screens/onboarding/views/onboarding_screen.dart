@@ -7,16 +7,16 @@ import '../../../components/dot_indicators.dart';
 import '../../../constants.dart';
 import '../../../providers/sci_kf_notifier.dart';
 import '../../../route/route_constants.dart';
-import 'components/onbording_content.dart';
+import 'components/onboarding_content.dart';
 
-class OnBordingScreen extends ConsumerStatefulWidget {
-  const OnBordingScreen({super.key});
+class OnBoardingScreen extends ConsumerStatefulWidget {
+  const OnBoardingScreen({super.key});
 
   @override
-  ConsumerState<OnBordingScreen> createState() => _OnBordingScreenState();
+  ConsumerState<OnBoardingScreen> createState() => _OnBordingScreenState();
 }
 
-class _OnBordingScreenState extends ConsumerState<OnBordingScreen> {
+class _OnBordingScreenState extends ConsumerState<OnBoardingScreen> {
 
   late PageController _pageController;
   int _pageIndex = 0;

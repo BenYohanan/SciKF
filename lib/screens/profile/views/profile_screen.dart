@@ -32,7 +32,7 @@ class ProfileScreen extends ConsumerWidget {
             press: () {
               Navigator.pushNamed(
                 context,
-                user == null ? homeScreenRoute : editUserInfoScreenRoute,
+                user == null ? researchScreenRoute : editUserInfoScreenRoute,
               );
             },
           ),
@@ -57,7 +57,7 @@ class ProfileScreen extends ConsumerWidget {
             text: "My Research",
             svgSrc: "assets/icons/Research.svg",
             press: () {
-              Navigator.pushNamed(context, researchScreenRoute);
+              Navigator.pushNamed(context, researchListScreenRoute);
             },
           ),
 

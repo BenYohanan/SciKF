@@ -88,7 +88,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
             route = mainScreenRoute;
             break;
           case 1:
-            route = homeScreenRoute;
+            route = researchScreenRoute;
             break;
           case 2:
             route = promptScreenRoute;
@@ -119,7 +119,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
             });
             break;
           case 1:
-            Navigator.pushNamed(context, homeScreenRoute).then((_) {
+            Navigator.pushNamed(context, researchScreenRoute).then((_) {
               if (mounted) {
                 setState(() {
                   _isNavigating = false;

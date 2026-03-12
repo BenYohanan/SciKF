@@ -10,15 +10,15 @@ import '../../size_config.dart';
 import 'Components/news_detail_screen.dart';
 import '../../widgets/scaffold_wrapper.dart';
 
-class HomeScreen extends StatefulWidget {
+class ResearchScreen extends StatefulWidget {
   final DatabaseHelper dbHelper;
-  const HomeScreen({super.key, required this.dbHelper});
+  const ResearchScreen({super.key, required this.dbHelper});
 
   @override
-  HomeScreenState createState() => HomeScreenState();
+  ResearchScreenState createState() => ResearchScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class ResearchScreenState extends State<ResearchScreen> {
   late Future<List<NewsItem>> _newsFuture;
 
   @override

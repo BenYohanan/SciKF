@@ -70,7 +70,7 @@ class _PromptScreenState extends State<PromptScreen> {
               children: [
                 SizedBox(height: getProportionateScreenHeight(30)),
                 Text(
-                  "Ask SciKF",
+                  "Ask Scinexa",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: getProportionateScreenWidth(24),
@@ -80,7 +80,7 @@ class _PromptScreenState extends State<PromptScreen> {
                 ),
                 SizedBox(height: getProportionateScreenHeight(15)),
                 Text(
-                  'Ask SciKF questions about inventions in Healthcare, Agriculture, and Health Sciences. SciKF is currently tailored to address questions in these aforementioned domains.',
+                  'Ask Scinexa questions about inventions in Healthcare, Agriculture, and Health Sciences. Scinexa is currently tailored to address questions in these aforementioned domains.',
                   textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontSize: getProportionateScreenHeight(15),

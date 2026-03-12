@@ -192,7 +192,7 @@ class _LogInFormState extends ConsumerState<LogInForm> {
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    homeScreenRoute,
+                    researchScreenRoute,
                         (route) => false,
                   );
                 },

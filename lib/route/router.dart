@@ -5,32 +5,32 @@ import 'package:news_feeds/screens/innovation/views/approvedInnovations_screen.d
 import '../screens/auth/views/login_screen.dart';
 import '../screens/auth/views/password_recovery_screen.dart';
 import '../screens/auth/views/signup_screen.dart';
-import '../screens/home/index.dart';
 import '../screens/innovation/views/added_for_review_message_screen.dart';
 import '../screens/innovation/views/censorship_innovations_page.dart';
 import '../screens/innovation/views/my_innovation/index_screen.dart';
 import '../screens/main/views/main_screen.dart';
 import '../screens/notification/view/notificatios_screen.dart';
 import '../screens/innovation/views/add_innovation_screen.dart';
-import '../screens/onbording/views/onbording_screnn.dart';
+import '../screens/onboarding/views/onboarding_screen.dart';
 import '../screens/profile/views/components/profile_edit_screen.dart';
 import '../screens/profile/views/profile_screen.dart';
-import '../screens/home/Components/prompt_screen.dart';
-import '../screens/home/Components/research_list_screen.dart';
+import '../screens/research/Components/prompt_screen.dart';
+import '../screens/research/Components/research_list_screen.dart';
+import '../screens/research/index.dart';
 import '../screens/search/views/search_screen.dart';
 import '../services/DatabaseHelper.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
-    case onbordingScreenRoute:
-      return MaterialPageRoute(builder: (context) => const OnBordingScreen());
+    case onboardingScreenRoute:
+      return MaterialPageRoute(builder: (context) => const OnBoardingScreen());
     case logInScreenRoute:
       return MaterialPageRoute(builder: (context) => const LoginScreen());
     case signUpScreenRoute:
       return MaterialPageRoute(builder: (context) => const SignUpScreen());
-    case homeScreenRoute:
+    case researchScreenRoute:
       return MaterialPageRoute(
-        builder: (context) => HomeScreen(dbHelper: DatabaseHelper()),
+        builder: (context) => ResearchScreen(dbHelper: DatabaseHelper()),
       );
     case mainScreenRoute:
       return MaterialPageRoute(builder: (context) => MainScreen());
@@ -38,7 +38,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => PromptScreen(dbHelper: DatabaseHelper()),
       );
-    case researchScreenRoute:
+    case researchListScreenRoute:
       return MaterialPageRoute(
         builder: (context) => ResearchListScreen(dbHelper: DatabaseHelper()),
       );
@@ -77,6 +77,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => const ApprovedInnovationsScreen(),
       );
     default:
-      return MaterialPageRoute(builder: (context) => const OnBordingScreen());
+      return MaterialPageRoute(builder: (context) => const OnBoardingScreen());
   }
 }
