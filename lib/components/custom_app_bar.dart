@@ -78,7 +78,7 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar>
           ),
         ),
         title: Text(
-           'Scinexa',
+           'SciDial',
           style: TextStyle(
             fontSize: getProportionateScreenHeight(20),
             fontWeight: FontWeight.bold,

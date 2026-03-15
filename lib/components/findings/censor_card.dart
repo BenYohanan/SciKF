@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
 import 'package:news_feeds/services/storage_keys.dart';
 import 'package:news_feeds/widgets/dialogs.dart';
@@ -52,13 +53,13 @@ class _CensorCardState extends ConsumerState<CensorCard> {
                     children: [
                       widget.image.isEmpty
                           ? Image.asset(
-                        'assets/img/NoImg.png',
-                        fit: BoxFit.cover,
-                      )
+                              'assets/img/NoImg.png',
+                              fit: BoxFit.cover,
+                            )
                           : NetworkImageWithLoader(
-                        widget.image,
-                        radius: defaultBorderRadius,
-                      )
+                              widget.image,
+                              radius: defaultBorderRadius,
+                            ),
                     ],
                   ),
                 ),
@@ -96,7 +97,9 @@ class _CensorCardState extends ConsumerState<CensorCard> {
                         widget.author.isEmpty ? "" : "Author: ${widget.author}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleSmall!.copyWith(fontSize: 12),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleSmall!.copyWith(fontSize: 12),
                       ),
                       SizedBox(height: getProportionateScreenHeight(8)),
                       Row(
@@ -113,7 +116,9 @@ class _CensorCardState extends ConsumerState<CensorCard> {
                           Text(
                             widget.date ?? '',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyMedium!.color,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium!.color,
                               fontSize: 10,
                             ),
                           ),
@@ -126,75 +131,158 @@ class _CensorCardState extends ConsumerState<CensorCard> {
             ],
           ),
           SizedBox(height: getProportionateScreenHeight(8)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      AppLoader.show(context);
-                      var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
-                      await baseHelperService.approveInnovation(widget.id);
-                      await baseHelperService.reloadData(ref, myId!);
-                      Navigator.pop(context);
-                      Dialogs.flushBar(context, "Success", "Innovation Approved Successfully");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
-                      textStyle: TextStyle(
-                        fontSize: getProportionateScreenHeight(12),
-                        fontWeight: FontWeight.w500,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text("Approve"),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(4)),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      AppLoader.show(context);
-                      var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
-                      await baseHelperService.rejectInnovation(widget.id);
-                      await baseHelperService.reloadData(ref, myId!);
-                      Navigator.pop(context);
-                      Dialogs.flushBar(context, "Success", "Innovation rejected Successfully");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      minimumSize: Size(double.infinity, getProportionateScreenHeight(36)),
-                      textStyle: TextStyle(
-                        fontSize: getProportionateScreenHeight(12),
-                        fontWeight: FontWeight.w500,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text("Reject"),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _buildActionButtons(context),
           Divider(
             color: primaryColor,
             thickness: 1,
             height: getProportionateScreenHeight(16),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    List<Widget> buttons = [];
+    buttons.add(
+      _buildActionButton(
+        context: context,
+        tooltip: "Approve",
+        label: "Approve",
+        text: "Approve",
+        iconPath: "assets/icons/Approve.svg",
+        color: primaryColor,
+        onPressed: () async {
+          AppLoader.show(context);
+          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+          await baseHelperService.approveInnovation(widget.id);
+          await baseHelperService.reloadData(ref, myId!);
+          Navigator.pop(context);
+          Dialogs.flushBar(
+            context,
+            "Success",
+            "Innovation Approved Successfully",
+          );
+        },
+      ),
+    );
+
+    buttons.add(
+      _buildActionButton(
+        context: context,
+        tooltip: "Reject",
+        label: "Reject",
+        text: "Reject",
+        iconPath: "assets/icons/Reject.svg",
+        color: primaryColor,
+        onPressed: () async {
+          AppLoader.show(context);
+          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+          await baseHelperService.rejectInnovation(widget.id);
+          await baseHelperService.reloadData(ref, myId!);
+          Navigator.pop(context);
+          Dialogs.flushBar(
+            context,
+            "Success",
+            "Innovation rejected Successfully",
+          );
+        },
+      ),
+    );
+
+    buttons.add(
+      _buildActionButton(
+        context: context,
+        tooltip: "Display Type",
+        label: "Display Type",
+        text: "Display Type",
+        iconPath: "assets/icons/Start.svg",
+        color: primaryColor,
+        onPressed: () async {
+          AppLoader.show(context);
+          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+          await baseHelperService.rejectInnovation(widget.id);
+          await baseHelperService.reloadData(ref, myId!);
+          Navigator.pop(context);
+          Dialogs.flushBar(
+            context,
+            "Success",
+            "Innovation rejected Successfully",
+          );
+        },
+      ),
+    );
+
+    return Wrap(
+      spacing: getProportionateScreenHeight(4),
+      runSpacing: getProportionateScreenHeight(4),
+      children: buttons,
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String tooltip,
+    required String label,
+    required String text,
+    required String iconPath,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: getProportionateScreenWidth(75),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: getProportionateScreenHeight(1),
+        ),
+        child: Tooltip(
+          message: tooltip,
+          child: Semantics(
+            label: label,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: color,
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                elevation: 1,
+                minimumSize: Size(
+                  double.infinity,
+                  getProportionateScreenHeight(28),
+                ),
+                textStyle: TextStyle(
+                  fontSize: getProportionateScreenHeight(8),
+                  fontWeight: FontWeight.w500,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  side: BorderSide(color: color, width: 0.5),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    iconPath,
+                    height: getProportionateScreenHeight(12),
+                    width: getProportionateScreenHeight(12),
+                    colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                  ),
+                  SizedBox(height: 1),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: getProportionateScreenHeight(7),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

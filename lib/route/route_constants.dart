@@ -19,3 +19,4 @@ const String researchListScreenRoute = "research_screen";
 const String approvedInnovationsScreenRoute = "approved_innovations";
 const String mainScreenRoute = "main_screen";
 const String addedForReviewMessageScreenRoute = "added_for_review_message_creen";
+const String usersScreenRoute = "users";

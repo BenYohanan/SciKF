@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import 'package:news_feeds/screens/innovation/views/approvedInnovations_screen.dart';
+import 'package:news_feeds/screens/users/users.dart';
 
 import '../screens/auth/views/login_screen.dart';
 import '../screens/auth/views/password_recovery_screen.dart';
@@ -75,6 +76,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case approvedInnovationsScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const ApprovedInnovationsScreen(),
+      );
+    case usersScreenRoute:
+      return MaterialPageRoute(
+        builder: (context) => const UsersScreen(),
       );
     default:
       return MaterialPageRoute(builder: (context) => const OnBoardingScreen());

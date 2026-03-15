@@ -69,6 +69,13 @@ class ProfileScreen extends ConsumerWidget {
                 Navigator.pushNamed(context, censorshipInnovationsPageRoute);
               },
             ),
+            ProfileMenuListTile(
+              text: "Users",
+              svgSrc: "assets/icons/User.svg",
+              press: () {
+                Navigator.pushNamed(context, usersScreenRoute);
+              },
+            ),
           ],
           ProfileMenuListTile(
             text: "Get Help",
