@@ -25,39 +25,28 @@ class _CensorshipInnovationsScreenState
     extends ConsumerState<CensorshipInnovationsScreen> {
 
   List<InnovationModel> pendingInnovations = [];
+  bool isLoading = true;
 
   final StorageService storageService = StorageService();
   final BaseHelperService baseHelperService = BaseHelperService();
 
-  bool _isLoading = false;
-
   Future<void> _loadPendingInnovations({bool forceSync = false}) async {
-
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
 
       if (!forceSync) {
-
-        final cachedJobsJson =
+        final cached =
         await storageService.getFromLocalStorage(unapprovedInnovationsKey);
 
-        if (cachedJobsJson != null &&
-            cachedJobsJson != "null" &&
-            cachedJobsJson.isNotEmpty) {
-
-          final List<dynamic> jsonList = jsonDecode(cachedJobsJson);
-
+        if (cached != null && cached != "null" && cached.isNotEmpty) {
+          final List<dynamic> jsonList = jsonDecode(cached);
           pendingInnovations =
-              jsonList.map((json) => InnovationModel.fromJson(json)).toList();
+              jsonList.map((e) => InnovationModel.fromJson(e)).toList();
         }
       }
 
       if (pendingInnovations.isEmpty || forceSync) {
-
-        pendingInnovations = await baseHelperService.getPendingInnovations();
+        pendingInnovations =
+        await baseHelperService.getPendingInnovations();
 
         var userId =
         await storageService.getFromLocalStorage(loginUserIdKey);
@@ -65,27 +54,18 @@ class _CensorshipInnovationsScreenState
         await baseHelperService.reloadData(ref, userId!);
       }
 
-      if (mounted) {
-        setState(() {});
-      }
-
     } catch (e) {
-
       if (mounted) {
-        Navigator.pop(context);
-
         await Dialogs.flushBar(
           context,
           "Error",
-          "Failed to load innovations: $e",
+          "Failed to load innovations",
         );
       }
-
     } finally {
-
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          isLoading = false;
         });
       }
     }
@@ -116,34 +96,13 @@ class _CensorshipInnovationsScreenState
 
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenHeight(16),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
 
-            child: ListView(
-              children: [
-
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: getProportionateScreenHeight(8),
-                  ),
-
-                  child: Text(
-                    "Censor Innovations",
-
-                    style: TextStyle(
-                      fontSize: getProportionateScreenHeight(20),
-                      color: primaryColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-
-                pendingInnovations.isEmpty
-                    ? _emptyView()
-                    : _innovationList(),
-              ],
-            ),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator(color: primaryColor,))
+                : pendingInnovations.isEmpty
+                ? _emptyView()
+                : _innovationList(),
           ),
         ),
       ),
@@ -153,13 +112,47 @@ class _CensorshipInnovationsScreenState
   }
 
   Widget _emptyView() {
+    return ListView(
+      children: [
+        SizedBox(height: getProportionateScreenHeight(80)),
 
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            Icon(Icons.verified_outlined,
+                size: 80, color: Colors.grey.shade400),
+
+            SizedBox(height: getProportionateScreenHeight(20)),
+
+            Text(
+              "All Caught Up",
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(18),
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+
+            SizedBox(height: getProportionateScreenHeight(10)),
+
+            const Text(
+              "There are no innovations pending review.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _innovationList() {
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 1,
+      itemCount: pendingInnovations.length,
 
       itemBuilder: (context, index) {
+        final innovation = pendingInnovations[index];
 
         return Padding(
           padding: EdgeInsets.only(
@@ -167,39 +160,15 @@ class _CensorshipInnovationsScreenState
           ),
 
           child: CensorCard(
-            image: "",
-            category: "",
-            author: "",
-            authorId: "",
-            title: "No Innovations Available",
-            status: "",
-            id: 0,
+            image: innovation.image,
+            category: innovation.category,
+            title: innovation.title,
+            author: innovation.author,
+            authorId: innovation.authorId ?? "",
+            date: innovation.date,
+            status: innovation.status,
+            id: innovation.id!,
           ),
-        );
-      },
-    );
-  }
-
-  Widget _innovationList() {
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: pendingInnovations.length,
-
-      itemBuilder: (context, index) {
-
-        final innovation = pendingInnovations[index];
-
-        return CensorCard(
-          image: innovation.image,
-          category: innovation.category,
-          title: innovation.title,
-          author: innovation.author,
-          authorId: innovation.authorId ?? "",
-          date: innovation.date,
-          status: innovation.status,
-          id: innovation.id!,
         );
       },
     );

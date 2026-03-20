@@ -79,6 +79,15 @@ class ClientListNotifier extends StateNotifier<List<ApplicationUser>> {
     }
   }
 
+  Future<void> makeUserAdmin(String id) async {
+    try {
+      await _service.deleteUser(id);
+      state = state.where((user) => user.id != id).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   ApplicationUser? findClient(String id) {
     try {
       return state.firstWhere((user) => user.id == id);

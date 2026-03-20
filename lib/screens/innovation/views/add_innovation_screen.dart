@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:news_feeds/constants.dart';
 import 'package:news_feeds/services/BaseHelperService.dart';
 import 'package:news_feeds/size_config.dart';
@@ -16,15 +18,20 @@ import '../../../components/custom_app_bar.dart';
 import '../../../components/custom_bottom_nav_bar.dart';
 
 class PostInnovationScreen extends ConsumerStatefulWidget {
-
   const PostInnovationScreen({super.key});
-  ConsumerState<PostInnovationScreen> createState() => _PostInnovationScreenState();
+
+  @override
+  ConsumerState<PostInnovationScreen> createState() =>
+      _PostInnovationScreenState();
 }
 
-class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
+class _PostInnovationScreenState
+    extends ConsumerState<PostInnovationScreen> {
   final TextEditingController _summaryController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+
   BaseHelperService baseHelperService = BaseHelperService();
+
   InnovationDTO innovation = InnovationDTO(
     displayImage: '',
     title: '',
@@ -33,8 +40,12 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
     authorId: "",
     file: '',
   );
+
   String? _fileName, _fileNameForDisplayImage;
-  PlatformFile? _selectedFile, _selectedFileForDisplayImage;
+
+  PlatformFile? _selectedFile;
+  File? _selectedImageFile;
+
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.any,
@@ -52,39 +63,49 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
   }
 
   Future<void> _pickDisplayImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      withData: kIsWeb,
-      withReadStream: !kIsWeb,
+    final picker = ImagePicker();
+
+    final XFile? pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 75,
+      maxWidth: 1024,
     );
 
-    if (result != null && result.files.isNotEmpty) {
+    if (pickedImage != null) {
       setState(() {
-        _selectedFileForDisplayImage = result.files.first;
-        _fileNameForDisplayImage = _selectedFileForDisplayImage!.name;
-        innovation.displayImage = _selectedFileForDisplayImage!.path ?? '';
+        _selectedImageFile = File(pickedImage.path);
+        _fileNameForDisplayImage = pickedImage.name;
+        innovation.displayImage = pickedImage.path;
       });
     }
   }
+
   Future<void> _save() async {
     if (innovation.title!.isEmpty || innovation.summary!.isEmpty) {
-        Dialogs.flushBar(context, 'Error', 'Please fill in all fields');
-        return;
+      Dialogs.flushBar(context, 'Error', 'Please fill in all fields');
+      return;
     }
+
     AppLoader.show(context);
-    var saveInnovation = await baseHelperService.createInnovation(innovation, _selectedFile, _selectedFileForDisplayImage);
-    if(!saveInnovation){
-      Navigator.pop(context);
+
+    var success = await baseHelperService.createInnovation(
+      innovation,
+      _selectedFile,
+      _selectedImageFile,
+    );
+
+    Navigator.pop(context);
+
+    if (!success) {
       Dialogs.flushBar(context, 'Error', 'Unable to save innovation');
       return;
     }
-    if(mounted){
+
+    if (mounted) {
       await baseHelperService.reloadData(ref, innovation.authorId!);
-      Navigator.pop(context);
       Navigator.pushNamed(context, addedForReviewMessageScreenRoute);
-      Dialogs.flushBar(context, 'Success', 'Innovation submitted for review');
-    } else {
-      Dialogs.flushBar(context, 'Error', 'Unable to submit innovation');
+      Dialogs.flushBar(
+          context, 'Success', 'Innovation submitted for review');
     }
   }
 
@@ -92,7 +113,7 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
   Widget build(BuildContext context) {
     final authProvider = ref.watch(sciKFProvider);
     final user = authProvider.user;
-    double screenWidth = SizeConfig.screenWidth;
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
@@ -101,12 +122,13 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
       body: SingleChildScrollView(
         padding: EdgeInsets.all(getProportionateScreenHeight(10)),
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 500),
+          constraints: const BoxConstraints(maxWidth: 500),
           child: Padding(
             padding: EdgeInsets.all(getProportionateScreenHeight(10)),
             child: Column(
               children: [
                 SizedBox(height: getProportionateScreenHeight(20)),
+
                 Text(
                   "Post an Innovation",
                   textAlign: TextAlign.center,
@@ -116,35 +138,27 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
                     color: primaryColor,
                   ),
                 ),
+
                 SizedBox(height: getProportionateScreenHeight(15)),
+
                 WidgetHelper().buildTextField(
                   controller: _titleController,
                   label: "Title",
                   placeHolder: "Enter title",
-                  onChanged: (_) => setState(() {
+                  onChanged: (_) {
                     innovation.title = _titleController.text;
-                  }),
+                  },
                 ),
+
                 SizedBox(height: getProportionateScreenHeight(15)),
+
                 DropdownSearch<Category>(
-                  compareFn: (Category a, Category b) => a == b,
+                  compareFn: (a, b) => a == b,
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
-                    searchFieldProps: TextFieldProps(
-                      decoration: InputDecoration(
-                        labelText: 'Search Category',
-                        labelStyle: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: getProportionateScreenHeight(14)),
-                        border: OutlineInputBorder(),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: primaryColor)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: primaryColor)),
-                      ),
-                    ),
                   ),
-                  decoratorProps: WidgetHelper().dropDownDecoratorProps("Category"),
+                  decoratorProps:
+                  WidgetHelper().dropDownDecoratorProps("Category"),
                   items: (filter, _) {
                     if (filter.isEmpty) return Category.values;
 
@@ -154,22 +168,24 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
                         .contains(filter.toLowerCase()))
                         .toList();
                   },
-                  itemAsString: (Category status) => status.displayName,
-                  onChanged: (Category? value) {
-                    setState(() {
-                      innovation.category = value;
-                    });
+                  itemAsString: (c) => c.displayName,
+                  onChanged: (value) {
+                    innovation.category = value;
                   },
                   selectedItem: innovation.category,
                 ),
+
                 SizedBox(height: getProportionateScreenHeight(15)),
-               WidgetHelper().buildUploadField(
+
+                WidgetHelper().buildUploadField(
                   label: "Research Document",
                   placeHolder: "Upload document / research paper",
                   fileName: _fileName,
                   onTap: _pickFile,
                 ),
+
                 SizedBox(height: getProportionateScreenHeight(15)),
+
                 WidgetHelper().buildUploadField(
                   label: "Display Image",
                   placeHolder: "Upload display image",
@@ -177,27 +193,76 @@ class _PostInnovationScreenState extends ConsumerState<PostInnovationScreen> {
                   onTap: _pickDisplayImage,
                   icon: Icons.image,
                 ),
+
+                // ✅ IMAGE PREVIEW
+                if (_selectedImageFile != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            _selectedImageFile!,
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+
+                        Positioned(
+                          right: 5,
+                          top: 5,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImageFile = null;
+                                _fileNameForDisplayImage = null;
+                              });
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(Icons.close,
+                                    size: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 SizedBox(height: getProportionateScreenHeight(15)),
+
                 WidgetHelper().buildTextField(
                   controller: _summaryController,
                   label: "Description",
                   maxLines: 4,
                   placeHolder: "Enter description",
-                  onChanged: (_) => setState(() {
+                  onChanged: (_) {
                     innovation.summary = _summaryController.text;
-                  }),
+                  },
                 ),
+
                 SizedBox(height: getProportionateScreenHeight(20)),
+
                 WidgetHelper().buildModernButtonWithIcon(
                   text: 'Submit',
                   color: primaryColor,
                   svgName: "Send.svg",
-                  onPressed: () async{
-                    if (_selectedFile == null || _selectedFileForDisplayImage == null) {
-                      Navigator.pop(context);
-                      Dialogs.flushBar(context, 'Error', 'Please upload both document and display image');
+                  onPressed: () async {
+                    if (_selectedFile == null ||
+                        _selectedImageFile == null) {
+                      Dialogs.flushBar(context, 'Error',
+                          'Please upload both document and display image');
                       return;
                     }
+
                     innovation.authorId = user!.id;
                     await _save();
                   },

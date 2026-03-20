@@ -33,26 +33,22 @@ class NewsDetailScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: getProportionateScreenHeight(8)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Date: ${newsItem.date}',
-                  style: TextStyle(
-                    fontSize: getProportionateScreenHeight(15),
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Source: ${newsItem.source}',
-                  style: TextStyle(
-                    fontSize: getProportionateScreenHeight(12),
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            Text(
+              'Date: ${newsItem.date}',
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(12),
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: getProportionateScreenHeight(8)),
+            Text(
+              'Source: ${newsItem.source}',
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(12),
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             SizedBox(height: getProportionateScreenHeight(8)),
             if (newsItem.responseType == 'news') ...[
@@ -60,7 +56,7 @@ class NewsDetailScreen extends StatelessWidget {
                 newsItem.summary,
                 style: TextStyle(
                   fontSize: getProportionateScreenHeight(16),
-                  color: Colors.grey[600],
+                  color: textColor,
                 ),
               ),
               SizedBox(height: getProportionateScreenHeight(16)),
@@ -69,13 +65,15 @@ class NewsDetailScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: getProportionateScreenHeight(15),
                   fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
               ),
+              SizedBox(height: getProportionateScreenHeight(8)),
               Text(
                 newsItem.details,
                 style: TextStyle(
                   fontSize: getProportionateScreenHeight(16),
-                  color: Colors.grey[600],
+                  color: textColor,
                 ),
               ),
             ] else ...[
@@ -134,7 +132,7 @@ class NewsDetailScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 3, // Subtle shadow
+                    elevation: 3,
                     shadowColor: Colors.black26,
                   ),
                 ),

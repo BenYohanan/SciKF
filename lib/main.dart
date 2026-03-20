@@ -61,7 +61,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: MaterialApp(
-        title: 'Scinexa',
+        title: 'SciDial',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme(context),
         themeMode: ThemeMode.light,

@@ -8,7 +8,6 @@ const kAnimationDuration = Duration(milliseconds: 200);
 const primaryColor = Color(0xFF2E7D32);
 const defaultDuration = Duration(milliseconds: 250);
 const String baseUrl = "https://scikf.bivisoft.com/api";
-// const String baseUrl = "http://192.168.1.199/api";
 const String imgBaseUrl = "https://scikf.bivisoft.com";
 const String logo = "assets/img/icon.png";
 

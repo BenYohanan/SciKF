@@ -24,6 +24,7 @@ class ApprovedInnovationsScreen extends ConsumerStatefulWidget {
 class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsScreen> {
 
   List<InnovationModel> approvedInnovations = [];
+  bool isLoading = true;
 
   final storageService = StorageService();
   final baseHelperService = BaseHelperService();
@@ -32,44 +33,41 @@ class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsS
     try {
 
       if (!forceSync) {
+        final cached = await storageService.getFromLocalStorage(approvedInnovationsKey);
 
-        final cachedInnovationsJson =
-        await storageService.getFromLocalStorage(approvedInnovationsKey);
-
-        if (cachedInnovationsJson != null &&
-            cachedInnovationsJson != "null" &&
-            cachedInnovationsJson.isNotEmpty) {
-
-          final List<dynamic> jsonList = jsonDecode(cachedInnovationsJson);
-
+        if (cached != null && cached != "null" && cached.isNotEmpty) {
+          final List<dynamic> jsonList = jsonDecode(cached);
           approvedInnovations =
-              jsonList.map((json) => InnovationModel.fromJson(json)).toList();
+              jsonList.map((e) => InnovationModel.fromJson(e)).toList();
         }
       }
 
       if (approvedInnovations.isEmpty || forceSync) {
-
         approvedInnovations = await baseHelperService.getAllInnovations();
 
         var userId = await storageService.getFromLocalStorage(loginUserIdKey);
-
-        await baseHelperService.reloadData(ref, userId!);
+        if (userId != null && userId.isNotEmpty) {
+          await baseHelperService.reloadData(ref, userId);
+        }else{
+          await storageService.saveToLocalStorage(
+            approvedInnovationsKey,
+            jsonEncode(approvedInnovations.map((e) => e.toJson()).toList()),
+          );
+        }
       }
-
-      if (mounted) {
-        setState(() {});
-      }
-
     } catch (e) {
-
       if (mounted) {
-        Navigator.pop(context);
-
         await Dialogs.flushBar(
           context,
           "Error",
           "Failed to load innovations",
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
@@ -96,36 +94,15 @@ class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsS
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: _refreshData,
+
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenHeight(16),
-            ),
-
-            child: ListView(
-              children: [
-
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: getProportionateScreenHeight(8),
-                  ),
-
-                  child: Text(
-                    "Innovations",
-
-                    style: TextStyle(
-                      fontSize: getProportionateScreenHeight(20),
-                      color: primaryColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-
-                approvedInnovations.isEmpty
-                    ? _emptyList()
-                    : _innovationList(),
-              ],
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator(color: primaryColor,))
+                : approvedInnovations.isEmpty
+                ? _emptyView()
+                : _innovationList(),
           ),
         ),
       ),
@@ -134,54 +111,47 @@ class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsS
     );
   }
 
-  Widget _emptyList() {
+  Widget _emptyView() {
+    return ListView(
+      children: [
+        SizedBox(height: getProportionateScreenHeight(80)),
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 1,
-
-      itemBuilder: (context, index) {
-
-        return Column(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-            Padding(
-              padding: EdgeInsets.only(
-                top: getProportionateScreenHeight(16),
-              ),
+            Icon(Icons.auto_awesome,
+                size: 80, color: Colors.grey.shade400),
 
-              child: SecondaryFindingsCard(
-                image: "",
-                category: "",
-                author: "No Innovations Available",
-                title: "",
-                date: "",
-                status: "",
-                authorEmail: "",
+            SizedBox(height: getProportionateScreenHeight(20)),
+
+            Text(
+              "No Approved Innovations",
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(18),
+                fontWeight: FontWeight.bold,
+                color: textColor,
               ),
             ),
 
-            Divider(
-              color: primaryColor,
-              thickness: 1,
-              height: getProportionateScreenHeight(16),
+            SizedBox(height: getProportionateScreenHeight(10)),
+
+            const Text(
+              "There are no approved innovations yet.\nCheck back later.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 
   Widget _innovationList() {
-
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       itemCount: approvedInnovations.length,
 
       itemBuilder: (context, index) {
-
         final innovation = approvedInnovations[index];
 
         return Column(
@@ -194,7 +164,6 @@ class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsS
 
               child: GestureDetector(
                 onTap: () {
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -214,12 +183,14 @@ class _ApprovedInnovationsScreenState extends ConsumerState<ApprovedInnovationsS
                   date: innovation.date,
                   status: innovation.status,
                   authorEmail: innovation.authorEmail,
+                  innovationId: innovation.id!,
+                  displayType: innovation.displayType,
                 ),
               ),
             ),
 
             Divider(
-              color: primaryColor,
+              color: Colors.grey.shade300,
               thickness: 1,
               height: getProportionateScreenHeight(16),
             ),

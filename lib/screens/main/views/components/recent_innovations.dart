@@ -1,70 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:news_feeds/route/route_constants.dart';
+import 'package:news_feeds/services/storage_keys.dart';
 import 'package:news_feeds/size_config.dart';
-
 import '../../../../components/innovation/innovation_card.dart';
 import '../../../../constants.dart';
 import '../../../../model/innovation_model.dart';
 import '../../../innovation/views/innovation_details_screen.dart';
 
-class RecentInnovations extends StatefulWidget {
-  RecentInnovations({
+class RecentInnovations extends StatelessWidget {
+  const RecentInnovations({
     super.key,
     required this.recentInnovations,
   });
-  List<InnovationModel> recentInnovations = [];
 
-  @override
-  State<RecentInnovations> createState() => _RecentInnovationsState();
-}
+  final List<InnovationModel> recentInnovations;
 
-class _RecentInnovationsState extends State<RecentInnovations> {
   @override
   Widget build(BuildContext context) {
+    if (recentInnovations.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.all(getProportionateScreenHeight(16)),
+        child: Column(
+          children: [
+            _header(context),
+            SizedBox(height: getProportionateScreenHeight(20)),
+            Icon(Icons.auto_awesome,
+                size: 60, color: Colors.grey.shade400),
+            SizedBox(height: getProportionateScreenHeight(10)),
+            const Text(
+              "No innovations yet",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: getProportionateScreenHeight(20)),
+        _header(context),
+
         Padding(
-          padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-          child: Text(
-            "Top Picks",
-            style: TextStyle(
-              fontSize: getProportionateScreenHeight(12),
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
+          padding: EdgeInsets.symmetric(
+            horizontal: getProportionateScreenHeight(16),
           ),
-        ),
-        SizedBox(
-          height: getProportionateScreenHeight(270),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.recentInnovations.length,
-            itemBuilder: (context, index) => Padding(
-              padding: EdgeInsets.only(
-                left: defaultPadding,
-                right: index == widget.recentInnovations.length - 1
-                    ? getProportionateScreenHeight(16)
-                    : 0,
-              ),
-              child: InnovationCard(
-                image: widget.recentInnovations[index].image,
-                author: widget.recentInnovations[index].author,
-                title: widget.recentInnovations[index].title,
-                category: widget.recentInnovations[index].category,
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: recentInnovations.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.75,
+            ),
+            itemBuilder: (context, index) {
+              final item = recentInnovations[index];
+
+              return InnovationCard(
+                image: item.image,
+                author: item.author,
+                title: item.title,
+                category: item.category,
+                displayType: item.displayType,
                 press: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => InnovationDetailsScreen(innovationModel: widget.recentInnovations[index]),
+                      builder: (context) =>
+                          InnovationDetailsScreen(
+                            innovationModel: item,
+                          ),
                     ),
                   );
                 },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _header(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Top Picks",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, approvedInnovationsScreenRoute);
+            },
+            child: Text(
+              "See all",
+              style: TextStyle(
+                fontSize: 12,
+                color: primaryColor,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-        )
-      ],
+        ],
+      ),
     );
   }
 }

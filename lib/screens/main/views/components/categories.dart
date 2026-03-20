@@ -6,112 +6,113 @@ import '../../../../constants.dart';
 
 class CategoryModel {
   final String name;
-  final String? svgSrc, route;
+  final String? svgSrc;
 
   CategoryModel({
     required this.name,
     this.svgSrc,
-    this.route,
   });
 }
 
-List<CategoryModel> categories = [
-  CategoryModel(name: "All Categories"),
-  CategoryModel(name: "Health Care",svgSrc: "assets/icons/Health.svg"),
+final List<CategoryModel> categories = [
+  CategoryModel(name: "Health Care", svgSrc: "assets/icons/Health.svg"),
   CategoryModel(name: "Agriculture", svgSrc: "assets/icons/Agriculture.svg"),
-  CategoryModel(name: "Environmental Science", svgSrc: "assets/icons/Environmental.svg")
+  CategoryModel(name: "Env. Science", svgSrc: "assets/icons/Environmental.svg"),
 ];
 
 class Categories extends StatelessWidget {
-  const Categories({
-    super.key,
-  });
+  const Categories({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          ...List.generate(
-            categories.length,
-            (index) => Padding(
-              padding: EdgeInsets.only(
-                  left: index == 0 ? getProportionateScreenHeight(16) : getProportionateScreenHeight(8),
-                  right:
-                      index == categories.length - 1 ? getProportionateScreenHeight(16) : 0),
-              child: CategoryBtn(
-                category: categories[index].name,
-                svgSrc: categories[index].svgSrc,
-                isActive: index == 0,
-                press: () {
-                  if (categories[index].route != null) {
-                    Navigator.pushNamed(context, categories[index].route!);
-                  }
-                },
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "Categories",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: primaryColor,
             ),
           ),
-        ],
-      ),
+        ),
+        SizedBox(height: getProportionateScreenHeight(4)),
+
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "Explore innovations across these areas",
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        SizedBox(height: getProportionateScreenHeight(12)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children: categories.map((item) {
+              return _CategoryChip(
+                category: item.name,
+                svgSrc: item.svgSrc,
+              );
+            }).toList(),
+          ),
+        ),
+        SizedBox(height: getProportionateScreenHeight(7)),
+      ],
     );
   }
 }
 
-class CategoryBtn extends StatelessWidget {
-  const CategoryBtn({
-    super.key,
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
     required this.category,
     this.svgSrc,
-    required this.isActive,
-    required this.press,
   });
 
   final String category;
   final String? svgSrc;
-  final bool isActive;
-  final VoidCallback press;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: press,
-      borderRadius: BorderRadius.all(Radius.circular(getProportionateScreenHeight(30))),
-      child: Container(
-        height: getProportionateScreenHeight(36),
-        padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(16)),
-        decoration: BoxDecoration(
-          color: isActive ? primaryColor : Colors.transparent,
-          border: Border.all(
-              color: isActive
-                  ? Colors.transparent
-                  : Theme.of(context).dividerColor),
-          borderRadius: const BorderRadius.all(Radius.circular(30)),
-        ),
-        child: Row(
-          children: [
-            if (svgSrc != null)
-              SvgPicture.asset(
-                svgSrc!,
-                height: getProportionateScreenHeight(20),
-                colorFilter: ColorFilter.mode(
-                  isActive ? Colors.white : Theme.of(context).iconTheme.color!,
-                  BlendMode.srcIn,
-                ),
-              ),
-            if (svgSrc != null) SizedBox(width: getProportionateScreenWidth(8)),
-            Text(
-              category,
-              style: TextStyle(
-                fontSize: getProportionateScreenHeight(12),
-                fontWeight: FontWeight.w500,
-                color: isActive
-                    ? Colors.white
-                    : Theme.of(context).textTheme.bodyLarge!.color,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (svgSrc != null)
+            SvgPicture.asset(
+              svgSrc!,
+              height: 16,
+              colorFilter: const ColorFilter.mode(
+                Colors.black54,
+                BlendMode.srcIn,
               ),
             ),
-          ],
-        ),
+          if (svgSrc != null) const SizedBox(width: 6),
+          Text(
+            category,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

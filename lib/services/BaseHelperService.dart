@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,7 +127,7 @@ class BaseHelperService {
 
   Future<List<ApplicationUser>> getAllUsers() async {
     final response = await _client.get(
-      Uri.parse('$baseUrl/User'),
+      Uri.parse('$baseUrl/User/GetAllUsers'),
       headers: _getHeaders(),
     );
 
@@ -188,6 +189,22 @@ class BaseHelperService {
     }
   }
 
+  Future<void> updateInnovationType(int id, int type) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/Innovation/UpdateType'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "id": id,
+        "type": type,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update type");
+    }
+  }
   Future<InnovationModel> getInnovationById(int id) async {
     final response = await _client.get(
       Uri.parse('$baseUrl/Innovation/get/$id'),
@@ -201,55 +218,55 @@ class BaseHelperService {
     }
   }
 
-  Future<bool> createInnovation(InnovationDTO innovation, PlatformFile? file, PlatformFile? image) async {
+  Future<bool> createInnovation(
+      InnovationDTO innovation,
+      PlatformFile? file,
+      File? imageFile,
+      ) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/Innovation/SaveInnovation'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/Innovation/SaveInnovation'),
+      );
+
       request.fields['Title'] = innovation.title ?? '';
       request.fields['Summary'] = innovation.summary ?? '';
-      request.fields['Category'] = innovation.category?.displayName ?? '';
+      request.fields['Category'] =
+          innovation.category?.displayName ?? '';
       request.fields['AuthorId'] = innovation.authorId ?? '';
 
       if (file != null) {
-        if (kIsWeb && file.bytes != null && file.bytes!.isNotEmpty) {
+        if (kIsWeb && file.bytes != null) {
           request.files.add(
             http.MultipartFile.fromBytes(
               'File',
               file.bytes!,
-              filename: file.name
+              filename: file.name,
             ),
           );
-        } else if (!kIsWeb && file.path != null) {
+        } else if (file.path != null) {
           request.files.add(
             await http.MultipartFile.fromPath(
               'File',
               file.path!,
-              filename: file.name
+              filename: file.name,
             ),
           );
         }
       }
 
-      if (image != null) {
-        if (kIsWeb && image.bytes != null && image.bytes!.isNotEmpty) {
-          request.files.add(
-            http.MultipartFile.fromBytes(
-              'DisplayImage',
-              image.bytes!,
-              filename: image.name
-            ),
-          );
-        } else if (!kIsWeb && image.path != null) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'DisplayImage',
-              image.path!,
-              filename: image.name
-            ),
-          );
-        }
+      if (imageFile != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'DisplayImage',
+            imageFile.path,
+            filename: imageFile.path.split('/').last,
+          ),
+        );
       }
 
       final response = await request.send();
+
       if (response.statusCode == 200) {
         await getAllInnovations();
         return true;

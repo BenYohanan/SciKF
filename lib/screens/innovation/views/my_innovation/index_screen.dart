@@ -8,6 +8,7 @@ import '../../../../components/custom_app_bar.dart';
 import '../../../../components/custom_bottom_nav_bar.dart';
 import '../../../../components/findings/secondary_product_card.dart';
 import '../../../../model/innovation_model.dart';
+import '../../../../route/route_constants.dart';
 import '../../../../services/BaseHelperService.dart';
 import '../../../../services/StorageService.dart';
 import '../../../../services/storage_keys.dart';
@@ -24,6 +25,7 @@ class MyInnovationScreen extends ConsumerStatefulWidget {
 class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
 
   List<InnovationModel> findings = [];
+  bool isLoading = true;
 
   final StorageService storageService = StorageService();
   final BaseHelperService baseHelperService = BaseHelperService();
@@ -32,47 +34,35 @@ class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
     try {
 
       if (!forceSync) {
+        final cached = await storageService.getFromLocalStorage(myInnovationsKey);
 
-        final cachedInnovationsJson =
-        await storageService.getFromLocalStorage(myInnovationsKey);
-
-        if (cachedInnovationsJson != null &&
-            cachedInnovationsJson != "null" &&
-            cachedInnovationsJson.isNotEmpty) {
-
-          final List<dynamic> jsonList = jsonDecode(cachedInnovationsJson);
-
-          findings =
-              jsonList.map((json) => InnovationModel.fromJson(json)).toList();
+        if (cached != null && cached != "null" && cached.isNotEmpty) {
+          final List<dynamic> jsonList = jsonDecode(cached);
+          findings = jsonList.map((e) => InnovationModel.fromJson(e)).toList();
         }
       }
 
       if (findings.isEmpty || forceSync) {
+        var userId = await storageService.getFromLocalStorage(loginUserIdKey);
 
-        var userId =
-        await storageService.getFromLocalStorage(loginUserIdKey);
-
-        findings =
-        await baseHelperService.getLoggedInUserInnovations(userId!);
+        findings = await baseHelperService.getLoggedInUserInnovations(userId!);
 
         await baseHelperService.reloadData(ref, userId);
       }
 
-      if (mounted) {
-        setState(() {});
-      }
-
     } catch (e) {
-
       if (mounted) {
-
-        Navigator.pop(context);
-
         await Dialogs.flushBar(
           context,
           "Error",
           "Failed to load innovations",
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
@@ -102,36 +92,13 @@ class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
 
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenHeight(16),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: getProportionateScreenHeight(8),
-                  ),
-
-                  child: Text(
-                    "My Innovations",
-
-                    style: TextStyle(
-                      fontSize: getProportionateScreenHeight(20),
-                      color: primaryColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-
-                findings.isEmpty
-                    ? _emptyView()
-                    : _innovationList(),
-              ],
-            ),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator(color: primaryColor,))
+                : findings.isEmpty
+                ? _emptyView()
+                : _innovationList(),
           ),
         ),
       ),
@@ -141,39 +108,53 @@ class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
   }
 
   Widget _emptyView() {
+    return ListView(
+      children: [
+        SizedBox(height: getProportionateScreenHeight(80)),
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 1,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
 
-      itemBuilder: (context, index) {
+            Icon(Icons.lightbulb_outline,
+                size: 80, color: Colors.grey.shade400),
 
-        return Padding(
-          padding: EdgeInsets.only(
-            top: getProportionateScreenHeight(16),
-          ),
+            SizedBox(height: getProportionateScreenHeight(20)),
 
-          child: SecondaryFindingsCard(
-            image: "",
-            category: "",
-            author: "",
-            title: "Add your first innovation",
-          ),
-        );
-      },
+            Text(
+              "No Innovations Yet",
+              style: TextStyle(
+                fontSize: getProportionateScreenHeight(18),
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+
+            SizedBox(height: getProportionateScreenHeight(10)),
+
+            const Text(
+              "You haven’t submitted any innovation yet.\nStart by adding your first idea.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+            SizedBox(height: getProportionateScreenHeight(20)),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, postAnInnovationScreenRoute);
+              },
+              child: const Text("Add Innovation"),
+            )
+          ],
+        ),
+      ],
     );
   }
 
   Widget _innovationList() {
-
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       itemCount: findings.length,
 
       itemBuilder: (context, index) {
-
         final innovation = findings[index];
 
         return Column(
@@ -186,7 +167,6 @@ class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
 
               child: GestureDetector(
                 onTap: () {
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -206,12 +186,13 @@ class _MyInnovationScreenState extends ConsumerState<MyInnovationScreen> {
                   date: innovation.date,
                   status: innovation.status,
                   authorEmail: innovation.authorEmail,
+                  innovationId: innovation.id!,
                 ),
               ),
             ),
 
             Divider(
-              color: primaryColor,
+              color: Colors.grey.shade300,
               thickness: 1,
               height: getProportionateScreenHeight(16),
             ),

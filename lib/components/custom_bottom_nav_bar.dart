@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:news_feeds/route/route_constants.dart';
 import '../../constants.dart';
+import '../providers/sci_kf_notifier.dart';
 import '../size_config.dart';
 
 class CustomBottomNavBar extends ConsumerStatefulWidget {
@@ -28,8 +29,11 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
+    final authState = ref.watch(sciKFProvider);
+    final user = authState.user;
+
+    final items = <BottomNavigationBarItem>[
+      if (user != null)
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             "assets/icons/Category.svg",
@@ -39,43 +43,55 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
           ),
           label: 'Home',
         ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            "assets/icons/Environmental.svg",
-            key: _newsFeedKey,
-            color: _selectedLUTIndex == 1 ? primaryColor : Colors.black54,
-            height: getProportionateScreenHeight(20),
-          ),
-          label: 'News Feed',
+
+      BottomNavigationBarItem(
+        icon: SvgPicture.asset(
+          "assets/icons/Environmental.svg",
+          key: _newsFeedKey,
+          color: _selectedLUTIndex == (user != null ? 1 : 0)
+              ? primaryColor
+              : Colors.black54,
+          height: getProportionateScreenHeight(20),
         ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            "assets/icons/Prompt.svg",
-            key: _askAIKey,
-            color: _selectedLUTIndex == 2 ? primaryColor : Colors.black54,
-            height: getProportionateScreenHeight(20),
-          ),
-          label: 'Prompt',
+        label: 'News Feed',
+      ),
+      BottomNavigationBarItem(
+        icon: SvgPicture.asset(
+          "assets/icons/Prompt.svg",
+          key: _askAIKey,
+          color: _selectedLUTIndex == (user != null ? 2 : 1)
+              ? primaryColor
+              : Colors.black54,
+          height: getProportionateScreenHeight(20),
         ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            "assets/icons/Innovations.svg",
-            key: _innovationKey,
-            color: _selectedLUTIndex == 3 ? primaryColor : Colors.black54,
-            height: getProportionateScreenHeight(20),
-          ),
-          label: 'Innovations',
+        label: 'Prompt',
+      ),
+      BottomNavigationBarItem(
+        icon: SvgPicture.asset(
+          "assets/icons/Innovations.svg",
+          key: _innovationKey,
+          color: _selectedLUTIndex == (user != null ? 3 : 2)
+              ? primaryColor
+              : Colors.black54,
+          height: getProportionateScreenHeight(20),
         ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            "assets/icons/Menu.svg",
-            key: _menuKey,
-            color:_selectedLUTIndex == 4 ? primaryColor : Colors.black54,
-            height: getProportionateScreenHeight(20),
-          ),
-          label: 'Menu',
+        label: 'Innovations',
+      ),
+      BottomNavigationBarItem(
+        icon: SvgPicture.asset(
+          "assets/icons/Menu.svg",
+          key: _menuKey,
+          color: _selectedLUTIndex == (user != null ? 4 : 3)
+              ? primaryColor
+              : Colors.black54,
+          height: getProportionateScreenHeight(20),
         ),
-      ],
+        label: 'Menu',
+      ),
+    ];
+
+    return BottomNavigationBar(
+      items: items,
       onTap: (index) async {
         if (_isNavigating) return;
         _onItemTapped(index);
@@ -83,7 +99,8 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
           _isNavigating = true;
         });
         String? route;
-        switch (index) {
+        int actualIndex = user != null ? index : index + 1;
+        switch (actualIndex) {
           case 0:
             route = mainScreenRoute;
             break;
@@ -94,7 +111,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
             route = promptScreenRoute;
             break;
           case 3:
-            route =  approvedInnovationsScreenRoute;
+            route = approvedInnovationsScreenRoute;
             break;
           case 4:
             route = profileScreenRoute;
@@ -107,8 +124,8 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
           });
           return;
         }
-
-        switch (index) {
+        final adjustedIndex = user != null ? index : index + 1;
+        switch (adjustedIndex) {
           case 0:
             Navigator.pushReplacementNamed(context, mainScreenRoute).then((_) {
               if (mounted) {
@@ -118,6 +135,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               }
             });
             break;
+
           case 1:
             Navigator.pushNamed(context, researchScreenRoute).then((_) {
               if (mounted) {
@@ -127,6 +145,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               }
             });
             break;
+
           case 2:
             Navigator.pushNamed(context, promptScreenRoute).then((_) {
               if (mounted) {
@@ -136,6 +155,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               }
             });
             break;
+
           case 3:
             Navigator.pushNamed(context, approvedInnovationsScreenRoute).then((_) {
               if (mounted) {
@@ -145,6 +165,7 @@ class _CustomBottomNavBarState extends ConsumerState<CustomBottomNavBar> {
               }
             });
             break;
+
           case 4:
             Navigator.pushNamed(context, profileScreenRoute).then((_) {
               if (mounted) {

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:news_feeds/services/BaseHelperService.dart';
-import 'package:news_feeds/services/storage_keys.dart';
-import 'package:news_feeds/widgets/dialogs.dart';
 
 import '../../constants.dart';
+import '../../services/BaseHelperService.dart';
 import '../../services/StorageService.dart';
+import '../../services/storage_keys.dart';
 import '../../size_config.dart';
-import '../loader.dart';
+import '../../widgets/dialogs.dart';
 import '../network_image_with_loader.dart';
 
 class CensorCard extends ConsumerStatefulWidget {
@@ -33,12 +32,62 @@ class CensorCard extends ConsumerStatefulWidget {
 }
 
 class _CensorCardState extends ConsumerState<CensorCard> {
-  BaseHelperService baseHelperService = BaseHelperService();
+  final BaseHelperService baseHelperService = BaseHelperService();
+  bool isProcessing = false;
+
+  Future<void> _handleAction({
+    required String action,
+    required Future<void> Function() apiCall,
+    required String successMessage,
+  }) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("$action Innovation"),
+        content: Text("Are you sure you want to $action this innovation?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(action),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => isProcessing = true);
+
+    try {
+      var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
+
+      await apiCall();
+
+      await baseHelperService.reloadData(ref, myId!);
+
+      Dialogs.flushBar(context, "Success", successMessage);
+    } catch (e) {
+      Dialogs.flushBar(context, "Error", "Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => isProcessing = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.zero,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -46,243 +95,136 @@ class _CensorCardState extends ConsumerState<CensorCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: getProportionateScreenHeight(90),
+                width: 90,
                 child: AspectRatio(
-                  aspectRatio: 1.15,
-                  child: Stack(
-                    children: [
-                      widget.image.isEmpty
-                          ? Image.asset(
-                              'assets/img/NoImg.png',
-                              fit: BoxFit.cover,
-                            )
-                          : NetworkImageWithLoader(
-                              widget.image,
-                              radius: defaultBorderRadius,
-                            ),
-                    ],
-                  ),
+                  aspectRatio: 1.1,
+                  child: widget.image.isEmpty
+                      ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)
+                      : NetworkImageWithLoader(widget.image),
                 ),
               ),
+              SizedBox(width: getProportionateScreenWidth(10)),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenHeight(8),
-                    vertical: getProportionateScreenHeight(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: getProportionateScreenHeight(10),
-                          fontWeight: FontWeight.w500,
-                          color: primaryColor,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                        fontSize: getProportionateScreenWidth(13),
                       ),
-                      SizedBox(height: getProportionateScreenHeight(5)),
-                      Text(
-                        widget.category,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: getProportionateScreenHeight(12),
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
-                        ),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(5)),
-                      Text(
-                        widget.author.isEmpty ? "" : "Author: ${widget.author}",
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleSmall!.copyWith(fontSize: 12),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(8)),
-                      Row(
-                        children: [
-                          Text(
-                            widget.status ?? '',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(4)),
+                    Text( "Category: ${widget.category}",
+                      style: TextStyle(color: Colors.grey, fontSize: getProportionateScreenHeight(11)),
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(4)),
+                    Text(
+                      "By ${widget.author}",
+                      style: TextStyle(fontSize: getProportionateScreenHeight(10)),
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(6)),
+                    Row(
+                      children: [
+                        if (widget.status != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              widget.status!,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: primaryColor,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: defaultPadding / 4),
-                          Text(
-                            widget.date ?? '',
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium!.color,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        SizedBox(width: getProportionateScreenWidth(8)),
+                        Text(
+                          widget.date ?? '',
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-              ),
+              )
             ],
           ),
-          SizedBox(height: getProportionateScreenHeight(8)),
-          _buildActionButtons(context),
-          Divider(
-            color: primaryColor,
-            thickness: 1,
-            height: getProportionateScreenHeight(16),
-          ),
+          SizedBox(height: getProportionateScreenHeight(10)),
+          if (isProcessing)
+            const Center(child: CircularProgressIndicator())
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _actionButton(
+                    label: "Approve",
+                    icon: "assets/icons/Approve.svg",
+                    color: Colors.green,
+                    onTap: () => _handleAction(
+                      action: "Approve",
+                      apiCall: () =>
+                          baseHelperService.approveInnovation(widget.id),
+                      successMessage: "Innovation Approved",
+                    ),
+                  ),
+                ),
+                SizedBox(width: getProportionateScreenWidth(8)),
+                Expanded(
+                  child: _actionButton(
+                    label: "Reject",
+                    icon: "assets/icons/Reject.svg",
+                    color: Colors.red,
+                    onTap: () => _handleAction(
+                      action: "Reject",
+                      apiCall: () =>
+                          baseHelperService.rejectInnovation(widget.id),
+                      successMessage: "Innovation Rejected",
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
-    List<Widget> buttons = [];
-    buttons.add(
-      _buildActionButton(
-        context: context,
-        tooltip: "Approve",
-        label: "Approve",
-        text: "Approve",
-        iconPath: "assets/icons/Approve.svg",
-        color: primaryColor,
-        onPressed: () async {
-          AppLoader.show(context);
-          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
-          await baseHelperService.approveInnovation(widget.id);
-          await baseHelperService.reloadData(ref, myId!);
-          Navigator.pop(context);
-          Dialogs.flushBar(
-            context,
-            "Success",
-            "Innovation Approved Successfully",
-          );
-        },
-      ),
-    );
-
-    buttons.add(
-      _buildActionButton(
-        context: context,
-        tooltip: "Reject",
-        label: "Reject",
-        text: "Reject",
-        iconPath: "assets/icons/Reject.svg",
-        color: primaryColor,
-        onPressed: () async {
-          AppLoader.show(context);
-          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
-          await baseHelperService.rejectInnovation(widget.id);
-          await baseHelperService.reloadData(ref, myId!);
-          Navigator.pop(context);
-          Dialogs.flushBar(
-            context,
-            "Success",
-            "Innovation rejected Successfully",
-          );
-        },
-      ),
-    );
-
-    buttons.add(
-      _buildActionButton(
-        context: context,
-        tooltip: "Display Type",
-        label: "Display Type",
-        text: "Display Type",
-        iconPath: "assets/icons/Start.svg",
-        color: primaryColor,
-        onPressed: () async {
-          AppLoader.show(context);
-          var myId = await StorageService().getFromLocalStorage(loginUserIdKey);
-          await baseHelperService.rejectInnovation(widget.id);
-          await baseHelperService.reloadData(ref, myId!);
-          Navigator.pop(context);
-          Dialogs.flushBar(
-            context,
-            "Success",
-            "Innovation rejected Successfully",
-          );
-        },
-      ),
-    );
-
-    return Wrap(
-      spacing: getProportionateScreenHeight(4),
-      runSpacing: getProportionateScreenHeight(4),
-      children: buttons,
-    );
-  }
-
-  Widget _buildActionButton({
-    required BuildContext context,
-    required String tooltip,
+  Widget _actionButton({
     required String label,
-    required String text,
-    required String iconPath,
+    required String icon,
     required Color color,
-    required VoidCallback onPressed,
+    required VoidCallback onTap,
   }) {
-    return SizedBox(
-      width: getProportionateScreenWidth(75),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: getProportionateScreenHeight(1),
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color.withOpacity(0.1),
+        foregroundColor: color,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: BorderSide(color: color),
         ),
-        child: Tooltip(
-          message: tooltip,
-          child: Semantics(
-            label: label,
-            child: ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: color,
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                elevation: 1,
-                minimumSize: Size(
-                  double.infinity,
-                  getProportionateScreenHeight(28),
-                ),
-                textStyle: TextStyle(
-                  fontSize: getProportionateScreenHeight(8),
-                  fontWeight: FontWeight.w500,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  side: BorderSide(color: color, width: 0.5),
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    iconPath,
-                    height: getProportionateScreenHeight(12),
-                    width: getProportionateScreenHeight(12),
-                    colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-                  ),
-                  SizedBox(height: 1),
-                  Text(
-                    text,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: getProportionateScreenHeight(7),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            icon,
+            height: 14,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
           ),
-        ),
+          const SizedBox(width: 6),
+          Text(label),
+        ],
       ),
     );
   }

@@ -3,7 +3,7 @@ import '../constants.dart';
 class InnovationModel {
   int? id;
   final String image, author, title, category;
-  final String? status, date, fileUrl, authorEmail, summary, authorId;
+  final String? status, date, fileUrl, authorEmail, summary, authorId, displayType;
 
   InnovationModel({
     this.id,
@@ -16,7 +16,8 @@ class InnovationModel {
     this.fileUrl,
     this.authorEmail,
     this.summary,
-    this.authorId
+    this.authorId,
+    this.displayType
   });
 
   factory InnovationModel.fromJson(Map<String, dynamic> json) {
@@ -32,9 +33,9 @@ class InnovationModel {
       summary: json['summary'] as String?,
       authorEmail: json['authorEmail'] as String?,
       authorId: json['authorId'] as String?,
+      displayType: json['type'] as String?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -48,6 +49,7 @@ class InnovationModel {
       'summary': summary,
       'authorEmail': authorEmail,
       'authorId': authorId,
+      'displayType': displayType,
     };
   }
 }

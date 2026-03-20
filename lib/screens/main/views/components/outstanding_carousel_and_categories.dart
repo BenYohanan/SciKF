@@ -24,17 +24,6 @@ class _OutstandingCarouselAndCategoriesState extends State<OutstandingCarouselAn
       children: [
         OutstandingCarousel(flashInnovations: widget.outstandingInnovation!),
         SizedBox(height: getProportionateScreenHeight(8)),
-        Padding(
-          padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-          child: Text(
-            "Categories",
-            style: TextStyle(
-              fontSize: getProportionateScreenHeight(16),
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-        ),
         const Categories(),
       ],
     );

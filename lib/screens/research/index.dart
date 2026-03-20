@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:news_feeds/constants.dart';
-import '../../components/loader.dart';
 import '../../model/news_item.dart';
 import '../../services/DatabaseHelper.dart';
 import '../../services/PromptService.dart';
@@ -8,149 +7,273 @@ import '../../components/custom_app_bar.dart';
 import '../../components/custom_bottom_nav_bar.dart';
 import '../../size_config.dart';
 import 'Components/news_detail_screen.dart';
-import '../../widgets/scaffold_wrapper.dart';
 
 class ResearchScreen extends StatefulWidget {
   final DatabaseHelper dbHelper;
+
   const ResearchScreen({super.key, required this.dbHelper});
 
   @override
-  ResearchScreenState createState() => ResearchScreenState();
+  State<ResearchScreen> createState() => _ResearchScreenState();
 }
 
-class ResearchScreenState extends State<ResearchScreen> {
+class _ResearchScreenState extends State<ResearchScreen> {
   late Future<List<NewsItem>> _newsFuture;
+  String _country = "Nigeria";
+  String _selectedCategory = "All";
 
   @override
   void initState() {
     super.initState();
-    _newsFuture = PromptService(widget.dbHelper).fetchScienceNews();
+
+    final service = PromptService(widget.dbHelper);
+    _newsFuture = service.fetchScienceNews();
+    _loadCountry();
+  }
+
+  Future<void> _loadCountry() async {
+    final service = PromptService(widget.dbHelper);
+    final country = await service.getUserCountry();
+
+    if (mounted) {
+      setState(() {
+        _country = country;
+      });
+    }
+  }
+
+  Future<void> _refresh() async {
+    final service = PromptService(widget.dbHelper);
+
+    setState(() {
+      _newsFuture = service.fetchScienceNews(force: true);
+    });
+
+    await _newsFuture;
+  }
+
+  List<NewsItem> _filterByCategory(List<NewsItem> items) {
+    if (_selectedCategory == "All") return items;
+
+    return items.where((e) {
+      final text =
+      "${e.title} ${e.summary}".toLowerCase();
+
+      if (_selectedCategory == "Health") {
+        return text.contains("health");
+      }
+      if (_selectedCategory == "Agriculture") {
+        return text.contains("agric");
+      }
+      if (_selectedCategory == "Environment") {
+        return text.contains("environment");
+      }
+      return true;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldWrapper(
+    return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(AppBar().preferredSize.height),
         child: CustomAppBar(),
       ),
-      body: FutureBuilder<List<NewsItem>>(
-        future: _newsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              snapshot.connectionState == ConnectionState.active) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              AppLoader.show(context);
-            });
-            return const SizedBox.shrink();
-          }
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context, rootNavigator: true).pop();
-          });
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Failed to load news: ${snapshot.error}',
-                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
-              ),
-            );
-          }
-
-          final newsItems = snapshot.data ?? [];
-          if (newsItems.isEmpty) {
-            return Center(
-              child: Text(
-                'No news available. Please try again later.',
-                style: TextStyle(fontSize: getProportionateScreenWidth(16)),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-            itemCount: newsItems.length,
-            itemBuilder: (context, index) {
-              final newsItem = newsItems[index];
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NewsDetailScreen(newsItem: newsItem),
-                  ),
-                ),
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  margin: EdgeInsets.only(bottom: getProportionateScreenHeight(12)),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(getProportionateScreenHeight(16)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          newsItem.title,
-                          style: TextStyle(
-                            fontSize: getProportionateScreenWidth(15),
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: getProportionateScreenHeight(8)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              newsItem.date,
-                              style: TextStyle(
-                                fontSize: getProportionateScreenWidth(14),
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                            Text(
-                              newsItem.source,
-                              style: TextStyle(
-                                fontSize: getProportionateScreenWidth(12),
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: getProportionateScreenHeight(8)),
-                        Text(
-                          newsItem.summary,
-                          style: TextStyle(
-                            fontSize: getProportionateScreenWidth(14),
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+      body: RefreshIndicator(
+        color: primaryColor,
+        onRefresh: _refresh,
+        child: FutureBuilder<List<NewsItem>>(
+          future: _newsFuture,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return ListView(
+                children: [
+                  SizedBox(height: getProportionateScreenHeight(200)),
+                  Center(
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
                     ),
                   ),
-                ),
+                ],
               );
+            }
+
+            final items = _filterByCategory(snapshot.data!);
+
+            if (items.isEmpty) {
+              return ListView(
+                children: [
+                  SizedBox(height: getProportionateScreenHeight(150)),
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off, size: getProportionateScreenHeight(50)),
+                        SizedBox(height: getProportionateScreenHeight(10)),
+                        Text("No research found"),
+                        SizedBox(height: getProportionateScreenHeight(6)),
+                        Text("Pull down to refresh"),
+                      ],
+                    ),
+                  )
+                ],
+              );
+            }
+
+            return ListView(
+              padding: EdgeInsets.all(getProportionateScreenHeight(14)),
+              children: [
+                _header(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                _categories(),
+                SizedBox(height: getProportionateScreenHeight(14)),
+
+                ...items.map((e) => _newsCard(e)).toList(),
+              ],
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(),
+    );
+  }
+
+  Widget _header() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Trending in $_country",
+          style: TextStyle(
+            fontSize: getProportionateScreenHeight(16),
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+        SizedBox(height: getProportionateScreenHeight(4)),
+        Text(
+          "Latest research & discoveries",
+          style: TextStyle(color: Colors.grey),
+        ),
+      ],
+    );
+  }
+
+  Widget _categories() {
+    final categories = ["All", "Health", "Agriculture", "Environment"];
+
+    return SizedBox(
+      height: getProportionateScreenHeight(30),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => SizedBox(width: getProportionateScreenWidth(5)),
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          final isActive = cat == _selectedCategory;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedCategory = cat;
+              });
             },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: getProportionateScreenHeight(12)),
+              decoration: BoxDecoration(
+                color: isActive ? primaryColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(getProportionateScreenHeight(12)),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                cat,
+                style: TextStyle(
+                  color: isActive ? Colors.white : textColor,
+                  fontSize: getProportionateScreenHeight(12),
+                ),
+              ),
+            ),
           );
         },
       ),
-      bottomNavigationBar: CustomBottomNavBar(),
+    );
+  }
+
+  Widget _newsCard(NewsItem item) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewsDetailScreen(newsItem: item),
+        ),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(bottom: getProportionateScreenHeight(12)),
+        padding: EdgeInsets.all(getProportionateScreenHeight(12)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(getProportionateScreenHeight(12)),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              item.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: getProportionateScreenHeight(12),
+                color: textColor
+              ),
+            ),
+            SizedBox(height: getProportionateScreenHeight(6)),
+
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.date,
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: getProportionateScreenHeight(10),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item.source,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: getProportionateScreenHeight(10),
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: getProportionateScreenHeight(6)),
+            Text(
+              item.summary,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: textColor),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

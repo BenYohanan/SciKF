@@ -19,17 +19,13 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-
   final storageService = StorageService();
   final baseHelperService = BaseHelperService();
 
   Future<void> _refreshMainScreenData({bool forceSync = false}) async {
     try {
-
       var userId = await storageService.getFromLocalStorage(loginUserIdKey);
-
       await baseHelperService.reloadData(ref, userId!);
-
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
@@ -41,13 +37,33 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     await _refreshMainScreenData(forceSync: true);
   }
 
+  Widget _buildBody(authState) {
+    final recent = authState.recentInnovations ?? [];
+    final outstanding = authState.flashInnovations ?? [];
+
+    if (authState.isLoading == true) {
+      return Center(child: CircularProgressIndicator(color: primaryColor,));
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: OutstandingCarouselAndCategories(
+            outstandingInnovation: outstanding,
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: RecentInnovations(
+            recentInnovations: recent,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     final authState = ref.watch(sciKFProvider);
-
-    final recentInnovations = authState.recentInnovations;
-    final outstandingInnovations = authState.flashInnovations;
 
     return Scaffold(
       appBar: PreferredSize(
@@ -57,22 +73,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: _refreshData,
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: OutstandingCarouselAndCategories(
-                  outstandingInnovation: outstandingInnovations,
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: RecentInnovations(
-                  recentInnovations: recentInnovations,
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: SafeArea(child: _buildBody(authState)),
       ),
       bottomNavigationBar: CustomBottomNavBar(),
     );

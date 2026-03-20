@@ -11,6 +11,7 @@ class InnovationCard extends StatelessWidget {
     required this.title,
     required this.category,
     required this.press,
+    this.displayType,
   });
 
   final String image;
@@ -18,74 +19,98 @@ class InnovationCard extends StatelessWidget {
   final String title;
   final String category;
   final VoidCallback press;
+  final String? displayType;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: press,
       child: Container(
-        width: getProportionateScreenWidth(200),
-        height: getProportionateScreenHeight(300),
         decoration: BoxDecoration(
-          border: Border.all(color: primaryColor, width: 1),
-          borderRadius: BorderRadius.circular(defaultBorderRadius),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            )
+          ],
         ),
         clipBehavior: Clip.hardEdge,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: getProportionateScreenHeight(180),
-              width: double.infinity,
-              child: image.isEmpty
-                  ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)
-                  : NetworkImageWithLoader(
-                      image,
-                      radius: defaultBorderRadius,
-                      fit: BoxFit.cover,
+            Stack(
+              children: [
+                SizedBox(
+                  height: getProportionateScreenHeight(140),
+                  width: double.infinity,
+                  child: image.isEmpty
+                      ? Image.asset('assets/img/NoImg.png', fit: BoxFit.cover)
+                      : NetworkImageWithLoader(image, fit: BoxFit.cover),
+                ),
+
+                if (displayType != null)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: displayType == "Flash"
+                            ? Colors.green
+                            : Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        displayType == "Flash" ? "⚡" : "🔥",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
                     ),
+                  ),
+              ],
             ),
+
             Padding(
-              padding: EdgeInsets.only(
-                left: getProportionateScreenHeight(16),
-                top: getProportionateScreenHeight(8),
-              ),
+              padding: EdgeInsets.all(getProportionateScreenHeight(10)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: getProportionateScreenHeight(10),
+                      fontSize: getProportionateScreenHeight(12),
                       fontWeight: FontWeight.bold,
                       color: textColor,
                     ),
                   ),
-                  SizedBox(height: getProportionateScreenHeight(4)),
-                  Text(
-                    "Author: ${author.toUpperCase()}",
-                    style: TextStyle(
-                      fontSize: getProportionateScreenHeight(10),
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
 
                   SizedBox(height: getProportionateScreenHeight(4)),
+
                   Text(
                     category,
                     style: TextStyle(
                       fontSize: getProportionateScreenHeight(10),
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor.withOpacity(0.5),
+                      color: primaryColor,
+                      fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  SizedBox(height: getProportionateScreenHeight(2)),
+
+                  Text(
+                    author,
+                    style: TextStyle(
+                      fontSize: getProportionateScreenHeight(10),
+                      color: Colors.grey.shade600,
+                    ),
                   ),
                 ],
               ),
