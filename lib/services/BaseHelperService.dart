@@ -127,7 +127,7 @@ class BaseHelperService {
 
   Future<List<ApplicationUser>> getAllUsers() async {
     final response = await _client.get(
-      Uri.parse('$baseUrl/User/GetAllUsers'),
+      Uri.parse('$baseUrl/User/getAllUsers'),
       headers: _getHeaders(),
     );
 
@@ -191,7 +191,7 @@ class BaseHelperService {
 
   Future<void> updateInnovationType(int id, int type) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/Innovation/UpdateType'),
+      Uri.parse('$baseUrl/Innovation/updateType'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -226,13 +226,12 @@ class BaseHelperService {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/Innovation/SaveInnovation'),
+        Uri.parse('$baseUrl/Innovation/saveInnovation'),
       );
 
       request.fields['Title'] = innovation.title ?? '';
       request.fields['Summary'] = innovation.summary ?? '';
-      request.fields['Category'] =
-          innovation.category?.displayName ?? '';
+      request.fields['Category'] = innovation.category.toString();
       request.fields['AuthorId'] = innovation.authorId ?? '';
 
       if (file != null) {

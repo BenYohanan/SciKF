@@ -6,7 +6,7 @@ import '../model/news_item.dart';
 import 'DatabaseHelper.dart';
 
 class PromptService {
-  static const String apiBaseUrl = '$baseUrl/Innovation';
+  static const String apiBaseUrl = '$baseUrl/Prompt';
 
   final DatabaseHelper dbHelper;
 
@@ -76,7 +76,7 @@ class PromptService {
       final userId = await getUserId();
 
       final response = await http.post(
-        Uri.parse('$apiBaseUrl/FetchScienceNews'),
+        Uri.parse('$apiBaseUrl/fetchNews'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -122,7 +122,7 @@ class PromptService {
       final userId = await getUserId();
 
       final response = await http.post(
-        Uri.parse('$apiBaseUrl/AnswerPrompt'),
+        Uri.parse('$apiBaseUrl/answerPrompt'),
         headers: {
           'Content-Type': 'application/json',
         },
