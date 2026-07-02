@@ -12,19 +12,19 @@ import '../screens/innovation/views/my_innovation/index_screen.dart';
 import '../screens/main/views/main_screen.dart';
 import '../screens/notification/view/notificatios_screen.dart';
 import '../screens/innovation/views/add_innovation_screen.dart';
-import '../screens/onboarding/views/onboarding_screen.dart';
 import '../screens/profile/views/components/profile_edit_screen.dart';
 import '../screens/profile/views/profile_screen.dart';
 import '../screens/research/Components/prompt_screen.dart';
 import '../screens/research/Components/research_list_screen.dart';
 import '../screens/research/index.dart';
 import '../screens/search/views/search_screen.dart';
+import '../screens/startup_screen/views/onboarding_screen.dart';
 import '../services/DatabaseHelper.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case onboardingScreenRoute:
-      return MaterialPageRoute(builder: (context) => const OnBoardingScreen());
+      return MaterialPageRoute(builder: (context) => const StartupScreen());
     case logInScreenRoute:
       return MaterialPageRoute(builder: (context) => const LoginScreen());
     case signUpScreenRoute:
@@ -82,6 +82,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => const UsersScreen(),
       );
     default:
-      return MaterialPageRoute(builder: (context) => const OnBoardingScreen());
+      return MaterialPageRoute(builder: (context) => const StartupScreen());
   }
 }

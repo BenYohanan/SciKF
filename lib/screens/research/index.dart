@@ -85,7 +85,7 @@ class _ResearchScreenState extends State<ResearchScreen> {
         child: FutureBuilder<List<NewsItem>>(
           future: _newsFuture,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return ListView(
                 children: [
                   SizedBox(height: getProportionateScreenHeight(200)),
@@ -93,6 +93,82 @@ class _ResearchScreenState extends State<ResearchScreen> {
                     child: CircularProgressIndicator(
                       color: primaryColor,
                     ),
+                  ),
+                ],
+              );
+            }
+
+            if (snapshot.hasError) {
+              return ListView(
+                padding: EdgeInsets.all(getProportionateScreenHeight(20)),
+                children: [
+                  SizedBox(height: getProportionateScreenHeight(120)),
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: getProportionateScreenHeight(50),
+                          color: Colors.red,
+                        ),
+                        SizedBox(height: getProportionateScreenHeight(12)),
+                        Text(
+                          "Unable to load research",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: getProportionateScreenHeight(15),
+                            color: textColor,
+                          ),
+                        ),
+                        SizedBox(height: getProportionateScreenHeight(8)),
+                        Text(
+                          "Please check your internet connection and try again.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(height: getProportionateScreenHeight(20)),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              final service = PromptService(widget.dbHelper);
+                              _newsFuture = service.fetchScienceNews(force: true);
+                            });
+                          },
+                          child: Container(
+                            height: getProportionateScreenHeight(45),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: getProportionateScreenHeight(25),
+                            ),
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(
+                                getProportionateScreenHeight(12),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Try Again",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return ListView(
+                children: [
+                  SizedBox(height: getProportionateScreenHeight(150)),
+                  Center(
+                    child: Text("No research found"),
                   ),
                 ],
               );

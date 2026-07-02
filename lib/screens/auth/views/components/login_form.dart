@@ -201,7 +201,7 @@ class _LogInFormState extends ConsumerState<LogInForm> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textColor.withOpacity(0.7),
-                    fontSize: getProportionateScreenWidth(14),
+                    fontSize: getProportionateScreenWidth(18),
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
                   ),

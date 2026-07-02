@@ -87,7 +87,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Back to"),
+                        Text("Back to", style: TextStyle(fontSize: getProportionateScreenHeight(14)),),
                         TextButton(
                           onPressed: () {
                             Navigator.pushNamed(context, logInScreenRoute);

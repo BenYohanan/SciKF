@@ -1,4 +1,4 @@
-const String onboardingScreenRoute = "onboarding";
+const String onboardingScreenRoute = "startup_screen";
 const String logInScreenRoute = "login";
 const String signUpScreenRoute = "signup";
 const String censorshipInnovationsPageRoute = "censorship_innovations";
